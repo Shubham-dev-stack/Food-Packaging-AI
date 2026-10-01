@@ -1,0 +1,82 @@
+[
+  {
+    "reference_id": "REF_ROBERTSON_2012",
+    "citation_short": "Robertson 2012",
+    "title": "Food Packaging: Principles and Practice, 3rd Edition",
+    "authors": "Gordon L. Robertson",
+    "publication_year": 2012,
+    "source_type": "textbook",
+    "doi_or_standard_number": "ISBN 978-1439862414",
+    "notes": "Comprehensive foundational reference on barrier polymer permeation physics, Arrhenius kinetics, shelf-life modeling, and food degradation mechanisms."
+  },
+  {
+    "reference_id": "REF_USDA_HB66_2016",
+    "citation_short": "Gross et al. (USDA HB66) 2016",
+    "title": "The Commercial Storage of Fruits, Vegetables, and Florist and Nursery Stocks (Agriculture Handbook 66)",
+    "authors": "Kenneth C. Gross, Chien Yi Wang, Mikal Saltveit",
+    "publication_year": 2016,
+    "source_type": "government_compendium",
+    "doi_or_standard_number": "USDA ARS Handbook 66",
+    "notes": "Authoritative USDA postharvest storage guidelines, respiration rates at reference temperatures, chilling sensitivity, and relative humidity recommendations."
+  },
+  {
+    "reference_id": "REF_KADER_2002",
+    "citation_short": "Kader 2002",
+    "title": "Postharvest Technology of Horticultural Crops, 3rd Edition",
+    "authors": "Adel A. Kader",
+    "publication_year": 2002,
+    "source_type": "textbook",
+    "doi_or_standard_number": "UC ANR Publication 3311",
+    "notes": "Definitive guide on modified atmosphere packaging (MAP) gas tolerances, critical oxygen extinction thresholds, and physiological injury from carbon dioxide."
+  },
+  {
+    "reference_id": "REF_FDA_CFSAN_2011",
+    "citation_short": "US FDA CFSAN 2011",
+    "title": "Fish and Fishery Products Hazards and Controls Guidance, 4th Edition",
+    "authors": "US Food and Drug Administration Center for Food Safety and Applied Nutrition",
+    "publication_year": 2011,
+    "source_type": "government_compendium",
+    "doi_or_standard_number": "FDA-2011-D-0125",
+    "notes": "Regulatory guidelines establishing the 4.6 pH threshold and refrigeration controls required for preventing Clostridium botulinum in reduced-oxygen packaging."
+  },
+  {
+    "reference_id": "REF_ASTM_D3985",
+    "citation_short": "ASTM D3985 (2017)",
+    "title": "Standard Test Method for Oxygen Gas Transmission Rate Through Plastic Film and Sheeting Using a Coulometric Sensor",
+    "authors": "ASTM International Committee D20 on Plastics",
+    "publication_year": 2017,
+    "source_type": "standards_document",
+    "doi_or_standard_number": "ASTM D3985-17",
+    "notes": "Standardized test method for steady-state OTR determination at 23 deg C and 0% relative humidity using coulometric detection."
+  },
+  {
+    "reference_id": "REF_ASTM_F1249",
+    "citation_short": "ASTM F1249 (2020)",
+    "title": "Standard Test Method for Water Vapor Transmission Rate Through Plastic Film and Sheeting Using a Modulated Infrared Sensor",
+    "authors": "ASTM International Committee F02 on Primary Barrier Packaging",
+    "publication_year": 2020,
+    "source_type": "standards_document",
+    "doi_or_standard_number": "ASTM F1249-20",
+    "notes": "Standardized test method for steady-state WVTR determination at 37.8 deg C and 90% relative humidity gradient using infrared sensor."
+  },
+  {
+    "reference_id": "REF_FONSECA_2002",
+    "citation_short": "Fonseca et al. 2002",
+    "title": "Modelling respiration rate to inform modified atmosphere packaging of fresh produce",
+    "authors": "S. C. Fonseca, F. A. R. Oliveira, J. K. Brecht",
+    "publication_year": 2002,
+    "source_type": "peer_reviewed_journal",
+    "doi_or_standard_number": "10.1016/S0260-8774(01)00144-8",
+    "notes": "Mathematical respiration modeling, Q10 Arrhenius temperature scaling, and equilibrium gas balance in perforated EMAP packaging."
+  },
+  {
+    "reference_id": "REF_MARSH_BUGUSU_2007",
+    "citation_short": "Marsh & Bugusu 2007",
+    "title": "Food Packaging—Roles, Materials, and Environmental Issues",
+    "authors": "Kenneth Marsh, Betty Bugusu",
+    "publication_year": 2007,
+    "source_type": "peer_reviewed_journal",
+    "doi_or_standard_number": "10.1111/j.1750-3841.2007.00301.x",
+    "notes": "Comparative review of polymer packaging materials, barrier performance, aluminum foil laminates, bio-based films, and recycling classifications."
+  }
+]

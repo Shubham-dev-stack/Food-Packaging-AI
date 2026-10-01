@@ -1,0 +1,403 @@
+[
+  {
+    "material_id": "MAT_LDPE_25UM",
+    "name": "Low-Density Polyethylene Monolayer Film (25 um)",
+    "trade_code": "LDPE-25",
+    "material_family": "LDPE",
+    "structure_type": "monolayer",
+    "density_g_cm3": 0.92,
+    "is_biodegradable": false,
+    "recyclability_category": "mono_material_recyclable",
+    "food_contact_compliant": true,
+    "sealability_rating": "excellent",
+    "seal_initiation_temp_c": 105.0,
+    "reference_id": "REF_ROBERTSON_2012",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_LDPE_25UM",
+        "nominal_thickness_um": 25.0,
+        "nominal_thickness_mil": 0.984,
+        "otr_value": 7000.0,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 16.0,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 28000.0,
+        "tensile_strength_md_mpa": 22.0,
+        "elongation_at_break_pct": 350.0,
+        "puncture_resistance_n": 15.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_ROBERTSON_2012"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_LDPE_25UM",
+      "carbon_footprint_kgco2e_per_kg": 2.0,
+      "circularity_tier": "high_circularity",
+      "is_mono_material": true,
+      "epr_category_india": "Category I (Rigid) / Category II (Flexible Plastic)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_LDPE_25UM",
+      "relative_cost_multiplier": 1.0,
+      "conversion_complexity": "low",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_HDPE_25UM",
+    "name": "High-Density Polyethylene Monolayer Film (25 um)",
+    "trade_code": "HDPE-25",
+    "material_family": "HDPE",
+    "structure_type": "monolayer",
+    "density_g_cm3": 0.95,
+    "is_biodegradable": false,
+    "recyclability_category": "mono_material_recyclable",
+    "food_contact_compliant": true,
+    "sealability_rating": "good",
+    "seal_initiation_temp_c": 125.0,
+    "reference_id": "REF_ROBERTSON_2012",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_HDPE_25UM",
+        "nominal_thickness_um": 25.0,
+        "nominal_thickness_mil": 0.984,
+        "otr_value": 2000.0,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 4.5,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 7500.0,
+        "tensile_strength_md_mpa": 35.0,
+        "elongation_at_break_pct": 250.0,
+        "puncture_resistance_n": 20.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_ROBERTSON_2012"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_HDPE_25UM",
+      "carbon_footprint_kgco2e_per_kg": 1.9,
+      "circularity_tier": "high_circularity",
+      "is_mono_material": true,
+      "epr_category_india": "Category II (Flexible Plastic Packaging)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_HDPE_25UM",
+      "relative_cost_multiplier": 1.15,
+      "conversion_complexity": "low",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_BOPET_12UM",
+    "name": "Biaxially Oriented Polyethylene Terephthalate Film (12 um)",
+    "trade_code": "BoPET-12",
+    "material_family": "PET",
+    "structure_type": "monolayer",
+    "density_g_cm3": 1.38,
+    "is_biodegradable": false,
+    "recyclability_category": "specialized_recycling",
+    "food_contact_compliant": true,
+    "sealability_rating": "poor",
+    "seal_initiation_temp_c": null,
+    "reference_id": "REF_ROBERTSON_2012",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_BOPET_12UM",
+        "nominal_thickness_um": 12.0,
+        "nominal_thickness_mil": 0.472,
+        "otr_value": 110.0,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 25.0,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 450.0,
+        "tensile_strength_md_mpa": 210.0,
+        "elongation_at_break_pct": 110.0,
+        "puncture_resistance_n": 35.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_ROBERTSON_2012"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_BOPET_12UM",
+      "carbon_footprint_kgco2e_per_kg": 2.8,
+      "circularity_tier": "medium_circularity",
+      "is_mono_material": false,
+      "epr_category_india": "Category II (Flexible Plastic Packaging)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_BOPET_12UM",
+      "relative_cost_multiplier": 1.6,
+      "conversion_complexity": "medium",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_MET_PET_PE",
+    "name": "Vacuum Metallized BoPET / Polyethylene Laminate (45 um)",
+    "trade_code": "MET-PET/PE",
+    "material_family": "metallized_film",
+    "structure_type": "multi_layer_laminate",
+    "density_g_cm3": 1.15,
+    "is_biodegradable": false,
+    "recyclability_category": "specialized_recycling",
+    "food_contact_compliant": true,
+    "sealability_rating": "excellent",
+    "seal_initiation_temp_c": 110.0,
+    "reference_id": "REF_ROBERTSON_2012",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_MET_PET_PE_45UM",
+        "nominal_thickness_um": 45.0,
+        "nominal_thickness_mil": 1.772,
+        "otr_value": 1.2,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 0.9,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 5.0,
+        "tensile_strength_md_mpa": 85.0,
+        "elongation_at_break_pct": 80.0,
+        "puncture_resistance_n": 42.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_ROBERTSON_2012"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_MET_PET_PE",
+      "carbon_footprint_kgco2e_per_kg": 3.2,
+      "circularity_tier": "low_circularity",
+      "is_mono_material": false,
+      "epr_category_india": "Category III (Multi-layered Plastic Packaging)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_MET_PET_PE",
+      "relative_cost_multiplier": 2.1,
+      "conversion_complexity": "medium",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_PET_ALU_PE",
+    "name": "Aluminum Foil High-Barrier Laminate: BoPET / Alu / PE (70 um)",
+    "trade_code": "PET/ALU/PE",
+    "material_family": "aluminum_foil_laminate",
+    "structure_type": "multi_layer_laminate",
+    "density_g_cm3": 1.45,
+    "is_biodegradable": false,
+    "recyclability_category": "non_recyclable_landfill",
+    "food_contact_compliant": true,
+    "sealability_rating": "excellent",
+    "seal_initiation_temp_c": 115.0,
+    "reference_id": "REF_MARSH_BUGUSU_2007",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_PET_ALU_PE_70UM",
+        "nominal_thickness_um": 70.0,
+        "nominal_thickness_mil": 2.756,
+        "otr_value": 0.02,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 0.02,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 0.05,
+        "tensile_strength_md_mpa": 95.0,
+        "elongation_at_break_pct": 45.0,
+        "puncture_resistance_n": 55.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_MARSH_BUGUSU_2007"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_PET_ALU_PE",
+      "carbon_footprint_kgco2e_per_kg": 6.5,
+      "circularity_tier": "linear_landfill",
+      "is_mono_material": false,
+      "epr_category_india": "Category III (Multi-layered Plastic Packaging)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_PET_ALU_PE",
+      "relative_cost_multiplier": 3.8,
+      "conversion_complexity": "high",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_PLA_BIO_25UM",
+    "name": "Neat Polylactic Acid Industrial Compostable Film (25 um)",
+    "trade_code": "PLA-25",
+    "material_family": "biodegradable_film",
+    "structure_type": "monolayer",
+    "density_g_cm3": 1.24,
+    "is_biodegradable": true,
+    "recyclability_category": "industrial_compostable",
+    "food_contact_compliant": true,
+    "sealability_rating": "moderate",
+    "seal_initiation_temp_c": 90.0,
+    "reference_id": "REF_MARSH_BUGUSU_2007",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_PLA_BIO_25UM",
+        "nominal_thickness_um": 25.0,
+        "nominal_thickness_mil": 0.984,
+        "otr_value": 450.0,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 190.0,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 1200.0,
+        "tensile_strength_md_mpa": 55.0,
+        "elongation_at_break_pct": 35.0,
+        "puncture_resistance_n": 18.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_MARSH_BUGUSU_2007"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_PLA_BIO_25UM",
+      "carbon_footprint_kgco2e_per_kg": 1.8,
+      "circularity_tier": "medium_circularity",
+      "is_mono_material": true,
+      "epr_category_india": "Category IV (Biodegradable / Compostable Plastics)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_PLA_BIO_25UM",
+      "relative_cost_multiplier": 2.4,
+      "conversion_complexity": "medium",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_PERF_BOPP_PE",
+    "name": "Laser Micro-Perforated BOPP / PE Film for Fresh Produce (35 um)",
+    "trade_code": "PERF-BOPP/PE",
+    "material_family": "breathable_film",
+    "structure_type": "perforated_film",
+    "density_g_cm3": 0.94,
+    "is_biodegradable": false,
+    "recyclability_category": "specialized_recycling",
+    "food_contact_compliant": true,
+    "sealability_rating": "excellent",
+    "seal_initiation_temp_c": 110.0,
+    "reference_id": "REF_FONSECA_2002",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_PERF_BOPP_PE_35UM",
+        "nominal_thickness_um": 35.0,
+        "nominal_thickness_mil": 1.378,
+        "otr_value": 12000.0,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 35.0,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 14500.0,
+        "tensile_strength_md_mpa": 60.0,
+        "elongation_at_break_pct": 120.0,
+        "puncture_resistance_n": 25.0,
+        "is_breathable": true,
+        "is_microperforated": true,
+        "microperforation_density_per_m2": 120,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_FONSECA_2002"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_PERF_BOPP_PE",
+      "carbon_footprint_kgco2e_per_kg": 2.2,
+      "circularity_tier": "medium_circularity",
+      "is_mono_material": false,
+      "epr_category_india": "Category II (Flexible Plastic Packaging)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_PERF_BOPP_PE",
+      "relative_cost_multiplier": 1.8,
+      "conversion_complexity": "high",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "material_id": "MAT_BOPE_PE_RECYCLE",
+    "name": "Recyclable All-Polyolefin Mono-Material Laminate: BoPE / PE (50 um)",
+    "trade_code": "BoPE/PE-Mono",
+    "material_family": "polyolefin_monomaterial",
+    "structure_type": "coextrusion",
+    "density_g_cm3": 0.93,
+    "is_biodegradable": false,
+    "recyclability_category": "mono_material_recyclable",
+    "food_contact_compliant": true,
+    "sealability_rating": "excellent",
+    "seal_initiation_temp_c": 110.0,
+    "reference_id": "REF_MARSH_BUGUSU_2007",
+    "barrier_properties": [
+      {
+        "barrier_id": "BAR_BOPE_PE_50UM",
+        "nominal_thickness_um": 50.0,
+        "nominal_thickness_mil": 1.968,
+        "otr_value": 8.5,
+        "otr_test_temp_c": 23.0,
+        "otr_test_rh_pct": 0.0,
+        "wvtr_value": 2.2,
+        "wvtr_test_temp_c": 37.8,
+        "wvtr_test_rh_pct": 90.0,
+        "co2_tr_value": 35.0,
+        "tensile_strength_md_mpa": 75.0,
+        "elongation_at_break_pct": 180.0,
+        "puncture_resistance_n": 38.0,
+        "is_breathable": false,
+        "is_microperforated": false,
+        "test_standard_otr": "ASTM D3985",
+        "test_standard_wvtr": "ASTM F1249",
+        "reference_id": "REF_MARSH_BUGUSU_2007"
+      }
+    ],
+    "sustainability_metric": {
+      "sustainability_id": "SUST_BOPE_PE_RECYCLE",
+      "carbon_footprint_kgco2e_per_kg": 2.1,
+      "circularity_tier": "high_circularity",
+      "is_mono_material": true,
+      "epr_category_india": "Category II (Flexible Polyolefin Mono-material)",
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    },
+    "cost_index": {
+      "cost_id": "COST_BOPE_PE_RECYCLE",
+      "relative_cost_multiplier": 1.7,
+      "conversion_complexity": "medium",
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  }
+]

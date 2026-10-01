@@ -1,0 +1,142 @@
+[
+  {
+    "commodity_id": "COMM_POTATO_CHIPS",
+    "common_name": "Fried Potato Chips",
+    "scientific_name": "Solanum tuberosum",
+    "category": "snack_fried",
+    "is_respiring": false,
+    "default_storage_mode": "ambient",
+    "description": "Thin sliced potatoes fried in vegetable oil. Highly prone to loss of crispness via moisture ingress and rancid off-odors via lipid photo-oxidation.",
+    "property": {
+      "property_id": "PROP_POTATO_CHIPS",
+      "typical_moisture_pct": 2.0,
+      "critical_water_activity_aw": 0.40,
+      "oil_fat_content_pct": 35.0,
+      "typical_ph": 6.0,
+      "primary_spoilage_pathways": ["moisture_gain", "oxidation"],
+      "is_light_sensitive": true,
+      "recommended_temp_min_c": 15.0,
+      "recommended_temp_max_c": 25.0,
+      "recommended_rh_min_pct": 40.0,
+      "recommended_rh_max_pct": 65.0,
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "commodity_id": "COMM_ROASTED_PEANUTS",
+    "common_name": "Roasted Salted Peanuts",
+    "scientific_name": "Arachis hypogaea",
+    "category": "snack_fried",
+    "is_respiring": false,
+    "default_storage_mode": "ambient",
+    "description": "Dry-roasted shelled peanuts with high unsaturated oil content. Susceptible to oxidative rancidity and hexanal development under oxygen and light.",
+    "property": {
+      "property_id": "PROP_ROASTED_PEANUTS",
+      "typical_moisture_pct": 2.5,
+      "critical_water_activity_aw": 0.45,
+      "oil_fat_content_pct": 49.0,
+      "typical_ph": 6.5,
+      "primary_spoilage_pathways": ["oxidation", "moisture_gain"],
+      "is_light_sensitive": true,
+      "recommended_temp_min_c": 10.0,
+      "recommended_temp_max_c": 20.0,
+      "recommended_rh_min_pct": 40.0,
+      "recommended_rh_max_pct": 60.0,
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "commodity_id": "COMM_BROCCOLI",
+    "common_name": "Fresh Broccoli Florets",
+    "scientific_name": "Brassica oleracea var. italica",
+    "category": "vegetable",
+    "is_respiring": true,
+    "default_storage_mode": "chilled",
+    "description": "Fresh horticultural floral heads with extremely high respiration and transpiration rates. Prone to floret yellowing under ambient temperatures and foul methanethiol off-odors under hypoxia.",
+    "property": {
+      "property_id": "PROP_BROCCOLI",
+      "typical_moisture_pct": 90.0,
+      "critical_water_activity_aw": 0.98,
+      "oil_fat_content_pct": 0.4,
+      "typical_ph": 6.5,
+      "primary_spoilage_pathways": ["senescence_fermentation", "moisture_loss", "mold_yeast"],
+      "is_light_sensitive": false,
+      "recommended_temp_min_c": 0.0,
+      "recommended_temp_max_c": 4.0,
+      "recommended_rh_min_pct": 95.0,
+      "recommended_rh_max_pct": 98.0,
+      "reference_id": "REF_USDA_HB66_2016"
+    },
+    "respiration_data": [
+      {
+        "respiration_id": "RESP_BROCCOLI_5C",
+        "reference_temp_c": 5.0,
+        "respiration_rate_co2": 65.0,
+        "respiration_class": "extremely_high",
+        "q10_factor": 2.2,
+        "critical_o2_extinction_pct": 1.0,
+        "max_tolerable_co2_pct": 15.0,
+        "condensation_risk_level": "high",
+        "reference_id": "REF_KADER_2002"
+      }
+    ],
+    "map_configuration": {
+      "map_id": "MAP_BROCCOLI",
+      "recommended_o2_min_pct": 1.0,
+      "recommended_o2_max_pct": 2.0,
+      "recommended_co2_min_pct": 5.0,
+      "recommended_co2_max_pct": 10.0,
+      "recommended_n2_pct": 88.0,
+      "target_storage_temp_c": 4.0,
+      "suitability_status": "suitable",
+      "application_notes": "Delays sepal yellowing and chlorophyll breakdown; requires perforated or breathable film to avoid sulfur off-odors if temperature spikes.",
+      "reference_id": "REF_KADER_2002"
+    }
+  },
+  {
+    "commodity_id": "COMM_FROZEN_PEAS",
+    "common_name": "Quick-Frozen Green Peas",
+    "scientific_name": "Pisum sativum",
+    "category": "vegetable",
+    "is_respiring": false,
+    "default_storage_mode": "frozen",
+    "description": "Blanched and individually quick frozen (IQF) green peas. Primary degradation mechanism is moisture sublimation leading to freezer burn and superficial oxidation.",
+    "property": {
+      "property_id": "PROP_FROZEN_PEAS",
+      "typical_moisture_pct": 79.0,
+      "critical_water_activity_aw": 0.82,
+      "oil_fat_content_pct": 0.4,
+      "typical_ph": 6.2,
+      "primary_spoilage_pathways": ["moisture_loss", "oxidation"],
+      "is_light_sensitive": false,
+      "recommended_temp_min_c": -22.0,
+      "recommended_temp_max_c": -18.0,
+      "recommended_rh_min_pct": 85.0,
+      "recommended_rh_max_pct": 95.0,
+      "reference_id": "REF_ROBERTSON_2012"
+    }
+  },
+  {
+    "commodity_id": "COMM_TOMATO_PASTE",
+    "common_name": "Concentrated Tomato Paste",
+    "scientific_name": "Solanum lycopersicum",
+    "category": "processed_food",
+    "is_respiring": false,
+    "default_storage_mode": "ambient",
+    "description": "Thermally concentrated high-acid tomato paste (pH < 4.6). Bacterial spore growth inhibited by acidity; vulnerable to mold, yeast, and lycopene carotenoid oxidation upon air contact.",
+    "property": {
+      "property_id": "PROP_TOMATO_PASTE",
+      "typical_moisture_pct": 71.0,
+      "critical_water_activity_aw": 0.93,
+      "oil_fat_content_pct": 0.5,
+      "typical_ph": 4.1,
+      "primary_spoilage_pathways": ["mold_yeast", "oxidation"],
+      "is_light_sensitive": true,
+      "recommended_temp_min_c": 15.0,
+      "recommended_temp_max_c": 25.0,
+      "recommended_rh_min_pct": 50.0,
+      "recommended_rh_max_pct": 70.0,
+      "reference_id": "REF_MARSH_BUGUSU_2007"
+    }
+  }
+]
