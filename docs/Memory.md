@@ -3,14 +3,14 @@
 **Project Name:** AI-Based Intelligent Food Packaging Material Recommendation System for Food Commodities  
 **Problem Statement ID:** SIH26236  
 **Document Type:** Persistent Project State & Decision History  
-**Last Updated:** Phase 1 Complete (Data Foundation & Curated Knowledge Base Verified)  
+**Last Updated:** Phase 2 Complete (Domain Physics & Recommendation Engine Verified)  
 
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 1 Complete — Data Foundation & Curated Knowledge Base Verified**. Ready for **Phase 2: Domain Physics & Recommendation Engine**.
-- **Data Foundation Status:** Relational ORM models, foreign-key enforcement, database check constraints, repository access layer, and JSON fixture ingestion fully implemented and verified via automated test suite.
-- **Application Code Status:** 17 automated tests passing in backend (`pytest` with 100% pass rate). Zero warnings in linting (`ruff check`) and code formatting (`ruff format --check`). Frontend build and strict TypeScript check verified with 0 errors.
+- **Current Phase:** **Phase 2 Complete — Domain Physics & Recommendation Engine Verified**. Ready for **Phase 3: REST API & Integration**.
+- **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All calculations based on published food science principles and verified peer-reviewed formulas.
+- **Application Code Status:** 36 automated tests passing in backend (`pytest` with 100% pass rate: 8 data model, 10 physics unit, 2 health, 9 engine integration scenarios, 7 seeding idempotency/repository tests). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`). Frontend build and strict TypeScript check verified with 0 errors.
 - **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
 
 ---
@@ -60,6 +60,10 @@
   - *Context:* SQLite defaults to disabled foreign keys unless explicitly activated per connection.
   - *Decision:* Registered an automatic SQLAlchemy connection listener executing `PRAGMA foreign_keys=ON` on every SQLite connection, paired with database-level `CheckConstraint` bounds on all physical quantities.
   - *Consequences:* Prevents invalid physical parameters or orphan records at the persistence boundary.
+- **ADR-006: Pure Decoupled Domain Intelligence Layer**
+  - *Context:* Business and physics recommendation logic should be completely decoupled from ORM entities, HTTP routes, serialization formats, and UI frameworks to ensure testability, safety, and reusability.
+  - *Decision:* Implemented domain logic exclusively within `backend/app/domain/` using pure Python types and standard library dataclasses (`RecommendationInput`, `TargetSpecifications`, `CandidateEvaluation`, `RecommendationResultDomain`).
+  - *Consequences:* The engine executes deterministically in in-memory test environments with zero HTTP or UI overhead.
 
 ---
 
@@ -90,20 +94,35 @@
 
 ---
 
-## 5. Intentionally Deferred Decisions & Future Scope
-- **Deferred Decision 1 (Dynamic Shelf-Life Kinetics):** Coupled differential equation simulations for variable non-isothermal cold chains are deferred to Phase 2 research; MVP prototype utilizes empirical benchmark shelf lives.
-- **Deferred Decision 2 (Automated Micro-Perforation Laser Sizing):** Exact numerical perforation diameter and pitch modeling per package geometry deferred to future empirical postharvest validation.
+## 5. Phase 2 Domain Physics & Recommendation Engine Summary
+
+- **Engine Package (`backend/app/domain/`):**
+  1. `types.py`: Domain data definitions, immutable dataclasses, and standard enums (`RecommendationStatus`, `CandidateEligibility`, `StorageType`, `TransitStress`).
+  2. `units.py`: Strict physical unit conversions ($\mu\text{m} \leftrightarrow \text{mil}$, $^\circ\text{C} \leftrightarrow \text{K}$), Tetens saturation vapor pressure equation $p_{\text{sat}}(T)$ with separate water and ice coefficients, and vapor pressure gradient calculation $\Delta p_w$.
+  3. `barrier.py`: Analytical steady-state moisture barrier equation (Robertson Eq. 78 mass-transfer approximation) bounded by empirical critical water activity intervals; lipid oxidation and high-acid oxygen barrier target rules; transit stress mechanical thickness derivation.
+  4. `respiration.py`: Fresh produce respiration kinetics scaled via $Q_{10}$ exponential model; equilibrium oxygen transmission rate ($\text{OTR}_{\text{eq}}$) calculation; micro-perforation and gas venting necessity evaluation.
+  5. `safety.py`: Mandatory Food Safety Advisory interceptor identifying reduced-oxygen packaging hazards (*Clostridium botulinum* germination in low-acid $pH \ge 4.6$ and high moisture $a_w \ge 0.92$) in compliance with FDA 21 CFR 114 and FSSAI packaging guidelines.
+  6. `filtering.py`: Deterministic constraint satisfaction filtering eliminating candidates with severe hypoxia risk, missing micro-perforations, insufficient WVTR/OTR, sub-zero embrittlement (neat PLA), or poor heat sealability.
+  7. `ranking.py`: Multi-Attribute Utility Analysis (MCDA) balancing barrier safety margin ($w=0.50$ baseline, $0.40$ sustainability-prioritized), circularity/sustainability score ($w=0.25$ baseline, $0.45$ prioritized), and normalized cost index ($w=0.25$ baseline, $0.15$ prioritized).
+  8. `explanation.py`: Deterministic explainability synthesis generating human-readable dominant spoilage drivers, critical storage factors, primary/alternative selection rationales, candidate disqualification audits with explicit rejection reasons, prototype modeling assumptions, and full bibliographic citation traceability.
+  9. `engine.py`: `RecommendationEngine.evaluate()` coordinator managing the end-to-end evaluation pipeline deterministically with zero database or network side effects.
+
+---
+
+## 6. Intentionally Deferred Decisions & Future Scope
+- **Deferred Decision 1 (Dynamic Shelf-Life Kinetics):** Coupled differential equation simulations for variable non-isothermal cold chains are deferred; MVP prototype utilizes empirical benchmark shelf lives.
+- **Deferred Decision 2 (Automated Micro-Perforation Laser Sizing):** Exact numerical perforation hole diameter, count, and pitch modeling per package geometry deferred to future empirical postharvest validation.
 - **Deferred Decision 3 (Live Polymer Resin Pricing Feeds):** Real-time commodity market pricing integration deferred; MVP utilizes normalized relative economic multipliers (LDPE = 1.0).
 
 ---
 
-## 6. Active Research Gaps & Open Scientific Questions
+## 7. Active Research Gaps & Open Scientific Questions
 1. Sizing mass-transfer equations for irregular non-pouch packaging geometries (e.g. thermoformed trays with lidding films).
 2. Cultivar-specific $Q_{10}$ factors under severe ambient temperature abuse ($>25^\circ\text{C}$).
 3. Threshold pinhole development in thin aluminum foil ($<12\ \mu\text{m}$) during long-haul rough-terrain transit.
 
 ---
 
-## 7. Next Implementation Phase
-- **Immediate Next Step:** **Phase 2 — Domain Physics & Recommendation Engine**.
-- **Scope of Phase 2:** Pure mathematical and physical domain algorithms in `backend/app/domain/` (vapor pressure differential $\Delta p_w$, maximum allowable WVTR/OTR target ranges, produce respiration $Q_{10}$ scaling, constraint filtering, and multi-criteria utility ranking). No frontend features or API endpoints.
+## 8. Next Implementation Phase
+- **Immediate Next Step:** **Phase 3 — REST API & Integration**.
+- **Scope of Phase 3:** FastAPI routers, Pydantic v2 request/response schemas, API error handling, integration between the persistence repository layer and domain recommendation engine, and API integration tests. No frontend features or UI implementation.
