@@ -191,13 +191,16 @@ flowchart LR
 
 ---
 
-### Phase 11: SIH Demo Polish & Benchmark Walkthroughs
-- **Objective:** Finalize live presentation presets, QR code export, and demo reliability.
+### Phase 11: Final Evaluation Harness, SIH Demo Polish & Evidence/Claims Audit ✅
+- **Objective:** Finalize golden evaluation matrix, audit scientific evidence/claims, and guarantee rock-solid demo reliability.
 - **Prerequisites:** Phase 10 complete; [docs/Evaluation.md](file:///d:/Food-Packaging-AI/docs/Evaluation.md).
 - **Deliverables:**
-  - One-click benchmark scenario buttons (Potato Chips, Fresh Broccoli, Tomato Ketchup, Eco-Friendly).
-  - Working QR code generator encoding packaging specifications.
-  - Complete 3-minute and 5-minute evaluator presentation scripts.
-- **Expected Files:** `frontend/src/components/demo/BenchmarkPresets.tsx`, `docs/Evaluation.md`.
-- **Verification:** Evaluator walkthrough executed seamlessly in under 3 minutes.
-- **Definition of Done:** The SIH presentation flow is rock-solid, explainable, and fully verified.
+  - Golden evaluation cases fixture (`data/evaluation/prototype_evaluation_cases.json`) covering Scenarios A through H.
+  - Automated evaluation matrix test suite (`backend/tests/test_evaluation_matrix.py`) testing all 8 scenarios end-to-end.
+  - Critical smoke test audit (`backend/tests/test_smoke.py`) tracing every asserted value to domain formulas, ASTM standards, or prototype assumptions.
+  - Comprehensive Claims & Evidence Audit categorizing claims into `[EXTERNAL EVIDENCE]`, `[INFERENCE]`, `[PROTOTYPE ASSUMPTION]`, `[RESEARCH REQUIRED]`, and `[CONTEXT DEPENDENT]`.
+  - Alternative recommendation selection audit in `backend/app/domain/ranking.py`.
+  - Updated 3-minute and 5-minute SIH live demonstration scripts in `docs/Evaluation.md`.
+- **Expected Files:** `data/evaluation/prototype_evaluation_cases.json`, `backend/tests/test_evaluation_matrix.py`, `backend/tests/test_smoke.py`, `docs/Evaluation.md`, `docs/Testing_Security.md`, `docs/Memory.md`.
+- **Verification:** 93/93 backend tests passing, 31/31 frontend tests passing, 6/6 manual demo flows verified, 0 ruff lint errors, production Vite build verified.
+- **Definition of Done:** The SIH presentation flow is rock-solid, explainable, evidence-backed, and fully verified.

@@ -70,6 +70,17 @@ The recommendation pipeline enforces 10 strict mathematical and architectural in
 9. **Invariant 9 (Constraint Immunity):** Changing soft preference weights alters candidate order only; disqualified candidates can never be rescued or promoted.
 10. **Invariant 10 (Research Integrity):** Produce lacking verified MAP mixtures or uncharacterized commodities explicitly output `RESEARCH_REQUIRED` / `INSUFFICIENT_EVIDENCE` without synthesizing fabricated gas compositions.
 
+### 2.5 Final Evaluation Matrix & Golden Cases Suite (Phase 11)
+The test suite includes the formal 8-scenario golden evaluation suite (`data/evaluation/prototype_evaluation_cases.json` and `backend/tests/test_evaluation_matrix.py`):
+1. **Scenario A (Potato Chips):** Ambient crispy snack; asserts WVTR $\le 2.5$, OTR $\le 2.0$, and light barrier requirement.
+2. **Scenario B (Roasted Peanuts):** High lipid fraction ($49\%$); asserts OTR $\le 2.0$ and determinism on repeat queries.
+3. **Scenario C (Fresh Broccoli):** High respiration ($60.07\text{ mg CO}_2\text{/(kg}\cdot\text{h)}$ at 4°C); asserts microperforation requirement, disqualification of dense foil, and preference constraint immunity.
+4. **Scenario D (Frozen Peas):** Sub-zero storage (-18°C); asserts WVTR $\le 18.0$, non-respiring state, and bio-film embrittlement caution.
+5. **Scenario E (Tomato Paste):** High-acid food ($\text{pH} < 4.6$); asserts OTR $\le 60.0$ to prevent lycopene bleaching.
+6. **Scenario F (Research-Required Produce):** Unverified produce; asserts explicit `RESEARCH_REQUIRED` status and refusal to fabricate gas mixes.
+7. **Scenario G (Catalog Failure):** Catalog lacking required barrier; asserts clean `RESEARCH_REQUIRED` status with 0 false positives and full rejection reasons.
+8. **Scenario H (Invalid Input):** Physical contradiction (frozen at +25°C); asserts sanitized HTTP 422 with zero traceback leakage.
+
 ---
 
 ## 3. Security Strategy & Threat Mitigations

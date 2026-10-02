@@ -51,9 +51,10 @@ def test_smoke_scenario_1_potato_chips_baseline(smoke_client: TestClient):
     Verifies:
     - Status is SUPPORTED
     - Primary material is high-barrier metallized/foil laminate (MET-PET/PE or PET/ALU/PE)
-    - Target WVTR < 5.0 and OTR < 10.0
-    - Light barrier requirement is enforced
-    - Explanation cites peer-reviewed shelf-life kinetics
+    - Target WVTR <= 2.5 g/(m2*day) [PROTOTYPE TARGET: Robertson 2012 / ASTM F1249-20]
+    - Target OTR <= 2.0 cm3/(m2*day*atm) [PROTOTYPE HEURISTIC: Robertson 2012 / ASTM D3985-17]
+    - Light barrier requirement is enforced for high-fat photosensitive snack
+    - Explanation cites peer-reviewed shelf-life kinetics and ASTM standards
     """
     payload = {
         "commodity_id": "COMM_POTATO_CHIPS",
@@ -74,10 +75,12 @@ def test_smoke_scenario_1_potato_chips_baseline(smoke_client: TestClient):
     assert data["primary_recommendation"]["eligibility"] == CandidateEligibility.ELIGIBLE
     assert data["primary_recommendation"]["trade_code"] in ["MET-PET/PE", "PET/ALU/PE"]
 
-    # Barrier specs
+    # Barrier specs traced to domain calculation:
+    # 1. Crispy snack (aw=0.20 <= 0.35) clamped to max 2.5 g/(m2*day) under ASTM F1249-20
     specs = data["target_specifications"]
-    assert specs["max_recommended_wvtr"] < 5.0
-    assert specs["max_recommended_otr"] < 10.0
+    assert specs["max_recommended_wvtr"] <= 2.5
+    # 2. High-lipid snack (fat=34.0% >= 20%) literature target OTR <= 2.0 under ASTM D3985-17
+    assert specs["max_recommended_otr"] <= 2.0
     assert specs["is_light_barrier_required"] is True
 
     # Audit traceability check
@@ -90,9 +93,9 @@ def test_smoke_scenario_2_fresh_broccoli_map(smoke_client: TestClient):
     """Smoke Test Scenario 2: Fresh Broccoli (chilled, high respiration rate).
 
     Verifies:
-    - Respiration rate temperature adjustment applied
-    - Microperforation flagged as required
-    - Equilibrium OTR demand calculated via coupled mass-balance
+    - Respiration rate temperature adjustment applied [EXTERNAL EVIDENCE: Fonseca 2002 Q10 model]
+    - Microperforation flagged as required for CO2 venting [EVIDENCE-DERIVED HEURISTIC: Kader 2002]
+    - Equilibrium OTR demand calculated via coupled mass-balance (OTR_eq > 5000)
     - Laser micro-perforated film (PERF-BOPP/PE) ranked as primary eligible candidate
     """
     payload = {
@@ -112,7 +115,8 @@ def test_smoke_scenario_2_fresh_broccoli_map(smoke_client: TestClient):
     assert data["primary_recommendation"] is not None
     assert data["primary_recommendation"]["trade_code"] == "PERF-BOPP/PE"
     assert data["target_specifications"]["is_microperforation_required"] is True
-    assert data["target_specifications"]["adjusted_respiration_rate_co2"] > 50.0
+    # Reference respiration rate 60.0 mg CO2/(kg*h) at 4 C in commodities.json
+    assert data["target_specifications"]["adjusted_respiration_rate_co2"] == 60.07
     assert "Equilibrium O2 demand" in data["target_specifications"]["target_otr_rationale"]
     assert any("micro-perforated or breathable" in note for note in data["uncertainty_notes"])
 
@@ -189,7 +193,7 @@ def test_smoke_scenario_4_impossible_constraints_no_candidates(smoke_client: Tes
 
     Verifies:
     - When candidate materials in the catalog fail mandatory barrier constraints:
-      * System returns status RESEARCH_REQUIRED
+      * System returns status RESEARCH_REQUIRED [PROTOTYPE STATUS]
       * Zero false-positive or fabricated materials (primary and alternative are None)
       * Ranked candidate count is 0
       * Disqualified candidates are cleanly enumerated with explicit failure reasons
@@ -202,7 +206,7 @@ def test_smoke_scenario_4_impossible_constraints_no_candidates(smoke_client: Tes
     orig_list = MaterialRepository.list_all
 
     def mock_permeable_only_catalog(db, family=None):
-        # Simulate a restricted catalog with permeable materials unable to protect dry goods
+        # [PROTOTYPE TEST FIXTURE] Simulate catalog lacking sufficient barrier for dry snacks
         return [m for m in orig_list(db, family) if m.trade_code in ["LDPE-25", "PLA-25"]]
 
     with patch.object(MaterialRepository, "list_all", side_effect=mock_permeable_only_catalog):

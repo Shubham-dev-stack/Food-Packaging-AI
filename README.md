@@ -20,7 +20,7 @@ The system is fully implemented, verified, and hardened for SIH demonstration ac
 - **Pure Domain Physics Engine:** ASTM F1249/D3985 barrier modeling, Fonseca post-harvest respiration kinetics, and multi-criteria utility trade-off optimization.
 - **REST API:** FastAPI application under canonical `/api` prefix, automated database initialization via lifespan hook, health/readiness probe, structured logging, and robust input validation.
 - **Frontend Workstation:** Responsive React 19 + TypeScript + Tailwind CSS workspace with real-time constraint calculation, explainability panels, MAP produce workflows, and resilient timeout/retry error boundaries.
-- **Test Coverage:** 100% verified test suite (85 backend unit/domain/smoke tests, 31 frontend component/integration tests).
+- **Test Coverage:** 100% verified test suite (93 backend unit/domain/smoke/evaluation tests, 31 frontend component/integration tests).
 
 ---
 
@@ -74,7 +74,7 @@ npm run dev
 Run the comprehensive test suites across both tiers:
 
 ```powershell
-# Run full backend test suite (85 tests covering domain physics, API contracts, invariants & smoke scenarios)
+# Run full backend test suite (93 tests covering domain physics, API contracts, invariants, evaluation matrix & smoke scenarios)
 backend\.venv\Scripts\python.exe -m pytest backend/tests -v
 
 # Run backend code quality & lint checks

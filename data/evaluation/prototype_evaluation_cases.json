@@ -1,0 +1,235 @@
+{
+  "description": "SIH26236 Prototype Golden Evaluation Cases. Explicitly documented test fixtures representing the 8 core evaluation scenarios across dry goods, respiring produce, frozen items, acid preservation, and boundary edge cases.",
+  "cases": [
+    {
+      "case_id": "SCENARIO_A_POTATO_CHIPS",
+      "commodity_id": "COMM_POTATO_CHIPS",
+      "common_name": "Fried Potato Chips",
+      "category": "dry_snack",
+      "description": "Ambient crispy snack with low water activity (aw=0.20) and high lipid content (fat=34%). Moisture sorption causes texture loss; oxygen causes oxidative rancidity.",
+      "inputs": {
+        "desired_shelf_life_days": 180,
+        "storage_temp_c": 25.0,
+        "storage_rh_pct": 75.0,
+        "storage_type": "ambient",
+        "transit_stress": "rough_terrain_unpaved",
+        "optimization_preference": "balanced"
+      },
+      "expected": {
+        "status": "SUPPORTED",
+        "primary_eligibility": "ELIGIBLE",
+        "candidate_class": "high_barrier_metallized_or_foil",
+        "max_recommended_wvtr_upper_bound": 2.5,
+        "max_recommended_otr_upper_bound": 2.0,
+        "is_light_barrier_required": true,
+        "is_microperforation_required": false
+      },
+      "citations": [
+        "REF_ROBERTSON_2012",
+        "REF_ASTM_F1249",
+        "REF_ASTM_D3985"
+      ],
+      "assumptions": [
+        "[PROTOTYPE ASSUMPTION] Linear permeance scaling for steady-state moisture flux.",
+        "[PROTOTYPE HEURISTIC] High lipid fraction (>20%) benchmark requires OTR <= 2.0 cm3/(m2*day*atm) and optical opacity."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_B_ROASTED_PEANUTS",
+      "commodity_id": "COMM_ROASTED_PEANUTS",
+      "common_name": "Roasted Salted Peanuts",
+      "category": "legume_nut",
+      "description": "Moderate moisture (aw=0.45), high-oil commodity (fat=49%) prone to lipid peroxidation and free-radical rancidity.",
+      "inputs": {
+        "desired_shelf_life_days": 90,
+        "storage_temp_c": 22.0,
+        "storage_rh_pct": 55.0,
+        "storage_type": "ambient",
+        "transit_stress": "local_standard",
+        "optimization_preference": "balanced"
+      },
+      "expected": {
+        "status": "SUPPORTED",
+        "primary_eligibility": "ELIGIBLE",
+        "candidate_class": "intermediate_to_high_barrier",
+        "max_recommended_wvtr_upper_bound": 4.5,
+        "max_recommended_otr_upper_bound": 2.0,
+        "is_light_barrier_required": true,
+        "is_microperforation_required": false
+      },
+      "citations": [
+        "REF_ROBERTSON_2012",
+        "REF_MARSH_BUGUSU_2007"
+      ],
+      "assumptions": [
+        "[PROTOTYPE HEURISTIC] Moderate aw (0.45) permits WVTR <= 4.5 g/(m2*day); high fat content strictly mandates OTR <= 2.0 cm3/(m2*day*atm)."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_C_FRESH_BROCCOLI",
+      "commodity_id": "COMM_BROCCOLI",
+      "common_name": "Fresh Broccoli Florets",
+      "category": "vegetable",
+      "description": "High-respiration chilled fresh produce (60 mg CO2/(kg*h) at 4 C). Requires active respiratory gas exchange; dense barrier films induce rapid anaerobic fermentation.",
+      "inputs": {
+        "desired_shelf_life_days": 14,
+        "storage_temp_c": 4.0,
+        "storage_rh_pct": 95.0,
+        "storage_type": "chilled",
+        "transit_stress": "long_haul_refrigerated",
+        "optimization_preference": "balanced"
+      },
+      "expected": {
+        "status": "SUPPORTED",
+        "primary_trade_code": "PERF-BOPP/PE",
+        "candidate_class": "laser_microperforated_breathable_film",
+        "is_microperforation_required": true,
+        "adjusted_respiration_rate_co2": 60.07,
+        "dense_foil_materials_disqualified": true
+      },
+      "citations": [
+        "REF_FONSECA_2002",
+        "REF_KADER_2002"
+      ],
+      "assumptions": [
+        "[EXTERNAL EVIDENCE: Fonseca 2002] Respiration temperature adjustment follows Q10 Arrhenius scaling.",
+        "[EVIDENCE-DERIVED HEURISTIC: Kader 2002] Continuous films with OTR < 20% of equilibrium demand trigger hypoxia rejection."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_D_FROZEN_PEAS",
+      "commodity_id": "COMM_FROZEN_PEAS",
+      "common_name": "Quick-Frozen Green Peas",
+      "category": "frozen_vegetable",
+      "description": "Deep-frozen vegetable stored at -18 C. Non-respiring in frozen state; primary threats are sublimation (freezer burn) and packaging embrittlement.",
+      "inputs": {
+        "desired_shelf_life_days": 180,
+        "storage_temp_c": -18.0,
+        "storage_rh_pct": 85.0,
+        "storage_type": "frozen",
+        "transit_stress": "long_haul_refrigerated",
+        "optimization_preference": "balanced"
+      },
+      "expected": {
+        "status": "SUPPORTED",
+        "primary_eligibility": "ELIGIBLE",
+        "candidate_class": "low_temperature_flexible_film",
+        "is_microperforation_required": false,
+        "max_recommended_wvtr_upper_bound": 18.0,
+        "biofilm_embrittlement_caution": true
+      },
+      "citations": [
+        "REF_ROBERTSON_2012",
+        "REF_ASTM_D1709"
+      ],
+      "assumptions": [
+        "[PROTOTYPE HEURISTIC: Robertson 2012] Moderate moisture barrier (WVTR <= 18.0) suppresses ice sublimation.",
+        "[QUALITATIVE CONCERN] Rigid bio-polyesters exhibit brittle impact fracture under sub-zero handling unless modified."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_E_TOMATO_PASTE",
+      "commodity_id": "COMM_TOMATO_PASTE",
+      "common_name": "Concentrated Tomato Paste",
+      "category": "processed_fruit_vegetable",
+      "description": "High-acid commodity (pH=4.1 < 4.6). Pathogenic vegetative bacteria inhibited by natural acidity; primary deterioration pathway is carotenoid (lycopene) bleaching and mold.",
+      "inputs": {
+        "desired_shelf_life_days": 60,
+        "storage_temp_c": 25.0,
+        "storage_rh_pct": 65.0,
+        "storage_type": "ambient",
+        "transit_stress": "local_standard",
+        "optimization_preference": "balanced"
+      },
+      "expected": {
+        "status": "SUPPORTED",
+        "primary_eligibility": "ELIGIBLE",
+        "candidate_class": "acid_tolerant_moderate_barrier",
+        "max_recommended_otr_upper_bound": 60.0,
+        "is_light_barrier_required": true,
+        "is_microperforation_required": false
+      },
+      "citations": [
+        "REF_ROBERTSON_2012",
+        "REF_USDA_2020"
+      ],
+      "assumptions": [
+        "[PROTOTYPE HEURISTIC: Robertson 2012] High-acid food (pH < 4.6) targets OTR <= 60.0 cm3/(m2*day*atm) to mitigate lycopene fading."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_F_RESEARCH_REQUIRED_PRODUCE",
+      "commodity_id": "COMM_SMOKE_UNVERIFIED",
+      "common_name": "Uncharacterized Wild Mushroom",
+      "category": "vegetable",
+      "description": "Active respiring crop lacking verified postharvest MAP headspace gas composition in published compendiums.",
+      "inputs": {
+        "desired_shelf_life_days": 7,
+        "storage_temp_c": 4.0,
+        "storage_rh_pct": 92.0,
+        "storage_type": "chilled"
+      },
+      "expected": {
+        "status": "RESEARCH_REQUIRED",
+        "uncertainty_flag": "RESEARCH REQUIRED",
+        "fabricated_gas_mixtures_prevented": true
+      },
+      "citations": [
+        "REF_KADER_2002"
+      ],
+      "assumptions": [
+        "[PROTOTYPE BOUNDARY] System refuses to hallucinate equilibrium gas concentrations when empirical data is absent from knowledge base."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_G_NO_QUALIFIED_CANDIDATES",
+      "commodity_id": "COMM_POTATO_CHIPS",
+      "common_name": "Fried Potato Chips (Restricted Catalog)",
+      "category": "dry_snack",
+      "description": "Simulation where available candidate packaging materials fail mandatory ASTM barrier limits.",
+      "inputs": {
+        "desired_shelf_life_days": 180,
+        "storage_temp_c": 25.0,
+        "storage_rh_pct": 75.0
+      },
+      "expected": {
+        "status": "RESEARCH_REQUIRED",
+        "primary_recommendation": null,
+        "alternative_recommendation": null,
+        "ranked_candidates_count": 0,
+        "disqualified_candidates_count_gt": 0,
+        "explicit_rejection_reasons_present": true
+      },
+      "citations": [
+        "REF_ASTM_F1249"
+      ],
+      "assumptions": [
+        "[PROTOTYPE BOUNDARY] Transparent reporting of zero eligible candidates without fabricating fallback materials."
+      ]
+    },
+    {
+      "case_id": "SCENARIO_H_INVALID_INPUT_SANITY",
+      "commodity_id": "COMM_POTATO_CHIPS",
+      "common_name": "Fried Potato Chips (Conflicting Regime)",
+      "category": "dry_snack",
+      "description": "Evaluation of boundary input validation: physical contradiction between storage regime ('frozen') and storage temperature (+25 C).",
+      "inputs": {
+        "desired_shelf_life_days": 60,
+        "storage_temp_c": 25.0,
+        "storage_rh_pct": 60.0,
+        "storage_type": "frozen"
+      },
+      "expected": {
+        "http_status": 422,
+        "error_code": "VALIDATION_ERROR",
+        "stack_trace_leaked": false
+      },
+      "citations": [
+        "RFC_7807"
+      ],
+      "assumptions": [
+        "[PHYSICAL SANITY BOUND] Frozen storage regime is physically invalid at temperatures above 0 C."
+      ]
+    }
+  ]
+}
