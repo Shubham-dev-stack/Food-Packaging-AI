@@ -8,10 +8,10 @@
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 4 Complete — Frontend Core & Input Workspace Verified**. Ready for **Phase 5: Recommendation Dashboard & Results Display**.
+- **Current Phase:** **Phase 5 Complete — Recommendation Dashboard & Results Display Verified**. Ready for **Phase 6: Multi-Criteria Decision & Trade-Off Engine**.
 - **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All calculations based on published food science principles and verified peer-reviewed formulas.
 - **Application Code Status:**
-  - Backend: 61 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
+  - Backend: 61 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`). Warning audit resolved 3 `HTTP_422_UNPROCESSABLE_ENTITY` deprecations by switching to `HTTP_422_UNPROCESSABLE_CONTENT`; 1 upstream Starlette `httpx2` testclient deprecation documented and harmless.
   - Frontend: Production build and strict TypeScript check verified with 0 errors (`tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
 - **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
 
@@ -218,7 +218,38 @@
 
 ---
 
-## 11. Next Implementation Phase
-- **Immediate Next Step:** **Phase 5 — Recommendation Dashboard & Results Display**.
-- **Scope of Phase 5:** Build candidate comparison cards, MCDA score breakdowns, target barrier vs material barrier visualization, MAP gas composition charts, disqualification explanation audit, and literature evidence provenance modal.
+## 11. Phase 5 Recommendation Dashboard & Results Display Summary
+
+- **Architecture:** Complete user-facing recommendation results experience presenting the backend's deterministic decision output without altering or replicating any scientific algorithms in the frontend.
+  - Zero duplicate recommendation logic in the client.
+  - Clean state flow: `IDLE` $\rightarrow$ `SUBMITTING` $\rightarrow$ `SUCCESS` (`result` view) / `ERROR`.
+  - Seamless navigation between the 2 workflow steps: `[1. Input Parameters]` $\leftrightarrow$ `[2. Recommendation Result]`, preserving submitted inputs and allowing instant adjustments or new evaluations.
+- **Created & Integrated Components (`frontend/src/`):**
+  1. `components/recommendation/StatusBadge.tsx`: Visual badge rendering the 4 backend decision states with explicit semantic badges:
+     - `SUPPORTED`: Sufficient evidence exists for prototype decision.
+     - `CONDITIONAL`: Depends on documented storage/handling conditions.
+     - `INSUFFICIENT_EVIDENCE`: Available information is not sufficient for confident recommendation.
+     - `RESEARCH_REQUIRED`: Scientific/data evidence is missing; no answer fabricated.
+  2. `components/recommendation/PrimaryRecommendationCard.tsx`: Highlights the primary recommended packaging structure, material family, trade code, nominal gauge (with mil conversion), OTR, WVTR, circularity/mono-material status, relative cost multiplier, MCDA score, and condition notes with non-guarantee prototype language.
+  3. `components/recommendation/AlternativeRecommendationCard.tsx`: Presents the alternative material structure for different engineering or circularity trade-offs (e.g. recyclable mono-material or bio-based polymer) without framing it as an error or inferior fallback.
+  4. `components/recommendation/TechnicalSpecificationGrid.tsx`: Dedicated technical specifications section displaying ASTM F1249 WVTR target, ASTM D3985 OTR target, ASTM D4169/F1306 recommended gauge, sealability, light-barrier requirement, microperforation requirement, and their respective analytical/mechanical rationales.
+  5. `components/recommendation/CandidateComparisonTable.tsx`: Full candidate comparison matrix displaying material name, polymer family, structure, eligibility, barrier safety score, circularity score, relative cost index, MCDA composite utility, gauge, OTR, and WVTR.
+  6. `components/recommendation/DisqualifiedCandidatesList.tsx`: Collapsible accordion displaying all disqualified candidates with their exact backend rejection reasons and barrier snapshots.
+  7. `components/recommendation/SafetyAdvisoryBanner.tsx`: Prominent, non-alarmist warning banner rendering contextual food safety advisories (e.g. *Clostridium botulinum* risks in reduced-oxygen packs) with explicit disclaimers regarding regulatory certification.
+  8. `components/recommendation/UncertaintyNotesCard.tsx`: Displays analytical uncertainty notes, documented engineering assumptions, and scientific limitations directly from the backend explanation trace.
+  9. `pages/RecommendationResultView.tsx`: Top-level result dashboard page assembling all specification and comparison components with review/modify action buttons and submitted context summary.
+- **Warning Audit (Step 0):**
+  - Audited 4 warnings from pytest suite:
+    - 3 warnings caused by Starlette deprecation of `HTTP_422_UNPROCESSABLE_ENTITY` in favor of `HTTP_422_UNPROCESSABLE_CONTENT`. Safely updated in `backend/app/api/errors.py`.
+    - 1 warning from upstream `starlette.testclient` recommending `httpx2`. Identified as an informational deprecation notice within Starlette's test harness; intentionally deferred as it does not affect correctness, runtime execution, or production dependencies.
+- **Verification Status:**
+  - `npm run build` (`tsc -b && vite build`): Succeeded in 603ms with 0 errors across 33 transformed modules.
+  - Backend pytest suite: 61 passed with 100% pass rate.
+  - Backend lint & format: 100% compliant (`ruff check`, `ruff format --check`).
+
+---
+
+## 12. Next Implementation Phase
+- **Immediate Next Step:** **Phase 6 — Multi-Criteria Decision & Trade-Off Engine**.
+- **Scope of Phase 6:** Interactive MCDA weight customization UI, trade-off radar/spider charts, sensitivity analysis across barrier vs. sustainability vs. cost dimensions, and live re-ranking triggers.
 

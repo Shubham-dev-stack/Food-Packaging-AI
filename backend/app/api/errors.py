@@ -52,7 +52,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             error_code="VALIDATION_ERROR",
             message="Invalid request input parameters provided.",
             details=formatted_details,
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         )
 
     @app.exception_handler(HTTPException)

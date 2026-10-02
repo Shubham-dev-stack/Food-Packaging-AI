@@ -3,6 +3,7 @@ import { CommodityPicker } from '../components/inputs/CommodityPicker';
 import { BaselinePreviewCard } from '../components/inputs/BaselinePreviewCard';
 import { EnvironmentalInputs } from '../components/inputs/EnvironmentalInputs';
 import { PropertyOverrides } from '../components/inputs/PropertyOverrides';
+import { RecommendationResultView } from './RecommendationResultView';
 import { Alert } from '../components/common/Alert';
 import { api, ApiError } from '../services/api';
 import type {
@@ -14,7 +15,12 @@ import type {
   RecommendationCreateRequest,
 } from '../types/api';
 
+type WorkflowStep = 'input' | 'result';
+
 export const Workspace: React.FC = () => {
+  // Navigation / Workflow view state
+  const [currentStep, setCurrentStep] = useState<WorkflowStep>('input');
+
   // Commodity state
   const [commodities, setCommodities] = useState<CommodityBriefResponse[]>([]);
   const [selectedCommodityId, setSelectedCommodityId] = useState<string>('');
@@ -39,10 +45,11 @@ export const Workspace: React.FC = () => {
   const [packageAreaM2, setPackageAreaM2] = useState<number>(0.06);
   const [sustainabilityPreference, setSustainabilityPreference] = useState<boolean>(false);
 
-  // Form submission & feedback state
+  // Form submission, audit snapshot & feedback state
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [lastSubmittedPayload, setLastSubmittedPayload] = useState<RecommendationCreateRequest | null>(null);
   const [recommendationResult, setRecommendationResult] = useState<RecommendationResponse | null>(null);
 
   // Initial load: Fetch commodities
@@ -227,8 +234,11 @@ export const Workspace: React.FC = () => {
 
     try {
       setSubmitting(true);
+      setLastSubmittedPayload(payload);
       const result = await api.createRecommendation(payload);
       setRecommendationResult(result);
+      setCurrentStep('result');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.response && Array.isArray(err.response.details)) {
@@ -248,10 +258,18 @@ export const Workspace: React.FC = () => {
     }
   };
 
+  const handleResetForNewEvaluation = () => {
+    setRecommendationResult(null);
+    setCurrentStep('input');
+    setGeneralError(null);
+    setErrors({});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
       {/* Top Navigation Bar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <span className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-bold text-sm shadow-xs">
@@ -260,10 +278,10 @@ export const Workspace: React.FC = () => {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-bold tracking-tight text-slate-900">
-                  SIH26236 Food Packaging Material Engine
+                  SIH26236 Food Packaging Recommendation Engine
                 </span>
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider">
-                  Phase 4 Workstation
+                  Phase 5 Decision Workstation
                 </span>
               </div>
               <p className="text-xs text-slate-500">
@@ -271,8 +289,35 @@ export const Workspace: React.FC = () => {
               </p>
             </div>
           </div>
+
           <div className="flex items-center space-x-3 text-xs">
-            <span className="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 text-slate-600 font-mono">
+            {recommendationResult && (
+              <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep('input')}
+                  className={`px-3 py-1 font-semibold rounded-lg transition cursor-pointer ${
+                    currentStep === 'input'
+                      ? 'bg-white text-emerald-800 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  1. Input Parameters
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep('result')}
+                  className={`px-3 py-1 font-semibold rounded-lg transition cursor-pointer ${
+                    currentStep === 'result'
+                      ? 'bg-white text-emerald-800 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  2. Recommendation Result
+                </button>
+              </div>
+            )}
+            <span className="hidden sm:inline-flex items-center px-2 py-1 rounded-md bg-slate-100 text-slate-600 font-mono">
               API: /api
             </span>
           </div>
@@ -289,219 +334,184 @@ export const Workspace: React.FC = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Input Workstation Form (7 cols on large screens) */}
-          <div className="lg:col-span-7 space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Commodity Selector Card */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                  <div>
-                    <h2 className="text-base font-bold text-slate-900">
-                      1. Target Commodity Selection
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      Select food commodity to load baseline literature properties
-                    </p>
-                  </div>
-                  <span className="text-xs font-semibold text-slate-400">Step 1 of 3</span>
-                </div>
-
-                <CommodityPicker
-                  commodities={commodities}
-                  selectedCommodityId={selectedCommodityId}
-                  loading={loadingCommodities}
-                  error={errors.commodity_id || null}
-                  onSelectCommodity={(id: string) => setSelectedCommodityId(id)}
-                  onRetry={fetchCommodities}
-                />
-              </div>
-
-              {/* Environmental & Distribution Conditions Card */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                  <div>
-                    <h2 className="text-base font-bold text-slate-900">
-                      2. Environmental & Supply Chain Conditions
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      Specify cold chain logistics, ambient storage, and distribution stressors
-                    </p>
-                  </div>
-                  <span className="text-xs font-semibold text-slate-400">Step 2 of 3</span>
-                </div>
-
-                <EnvironmentalInputs
-                  shelfLifeDays={shelfLifeDays}
-                  storageType={storageType}
-                  storageTempC={storageTempC}
-                  storageRhPct={storageRhPct}
-                  transitStress={transitStress}
-                  onShelfLifeChange={setShelfLifeDays}
-                  onStorageTypeChange={handleStorageTypeChange}
-                  onStorageTempChange={setStorageTempC}
-                  onStorageRhChange={setStorageRhPct}
-                  onTransitStressChange={setTransitStress}
-                  errors={errors}
-                />
-              </div>
-
-              {/* Property Overrides & Geometry Card */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    3. Overrides & Packaging Geometry
-                  </h3>
-                  <span className="text-xs font-semibold text-slate-400">Step 3 of 3</span>
-                </div>
-
-                <PropertyOverrides
-                  commodity={commodityDetail}
-                  moistureContentPct={moistureContentPct}
-                  waterActivityAw={waterActivityAw}
-                  fatContentPct={fatContentPct}
-                  ph={ph}
-                  respirationRateCo2={respirationRateCo2}
-                  packageWeightKg={packageWeightKg}
-                  packageAreaM2={packageAreaM2}
-                  sustainabilityPreference={sustainabilityPreference}
-                  onMoistureChange={setMoistureContentPct}
-                  onWaterActivityChange={setWaterActivityAw}
-                  onFatChange={setFatContentPct}
-                  onPhChange={setPh}
-                  onRespirationRateChange={setRespirationRateCo2}
-                  onPackageWeightChange={setPackageWeightKg}
-                  onPackageAreaChange={setPackageAreaM2}
-                  onSustainabilityPreferenceChange={setSustainabilityPreference}
-                  errors={errors}
-                />
-              </div>
-
-              {/* Submission Button */}
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={submitting || loadingCommodities || !selectedCommodityId}
-                  className="w-full py-4 px-6 rounded-xl font-bold text-sm text-white bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 disabled:cursor-not-allowed shadow-sm transition flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  {submitting ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8H4z"
-                        />
-                      </svg>
-                      <span>Evaluating Barrier Permeation & Optimizing Candidates...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Run Recommendation Engine</span>
-                      <svg
-                        className="w-4 h-4 ml-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M14 5l7 7m0 0l-7 7m7-7H3"
-                        />
-                      </svg>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Right Column: Baseline Inspection Card & Phase 5 Transition State (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="sticky top-24 space-y-6">
-              <BaselinePreviewCard
-                commodity={commodityDetail}
-                loading={loadingDetail}
-              />
-
-              {/* Phase 4 -> Phase 5 Handoff Feedback Panel */}
-              {recommendationResult && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 shadow-xs space-y-4 animate-fade-in">
-                  <div className="flex items-center space-x-3">
-                    <span className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm">
-                      ✓
-                    </span>
+        {/* WORKFLOW VIEW 2: RECOMMENDATION RESULT DASHBOARD */}
+        {currentStep === 'result' && recommendationResult ? (
+          <RecommendationResultView
+            result={recommendationResult}
+            submittedInput={lastSubmittedPayload}
+            onModifyInputs={() => setCurrentStep('input')}
+            onNewEvaluation={handleResetForNewEvaluation}
+          />
+        ) : (
+          /* WORKFLOW VIEW 1: INPUT WORKSPACE */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Input Workstation Form (7 cols on large screens) */}
+            <div className="lg:col-span-7 space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Commodity Selector Card */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                     <div>
-                      <h3 className="text-sm font-bold text-emerald-950">
-                        Engine Run Completed Successfully
-                      </h3>
-                      <p className="text-xs text-emerald-700 font-mono">
-                        Request ID: {recommendationResult.request_id}
+                      <h2 className="text-base font-bold text-slate-900">
+                        1. Target Commodity Selection
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        Select food commodity to load baseline literature properties
                       </p>
                     </div>
+                    <span className="text-xs font-semibold text-slate-400">Step 1 of 3</span>
                   </div>
 
-                  <div className="bg-white rounded-xl p-4 border border-emerald-100 space-y-3 text-xs">
-                    <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                      <span className="text-slate-500 font-medium">Evaluation Status:</span>
-                      <span className="font-bold text-emerald-800 uppercase tracking-wide">
-                        {recommendationResult.status}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                      <span className="text-slate-500 font-medium">Qualified Materials:</span>
-                      <span className="font-bold text-slate-800">
-                        {recommendationResult.ranked_candidates.length} Candidates
-                      </span>
-                    </div>
-                    {recommendationResult.primary_recommendation && (
-                      <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span className="text-slate-500 font-medium">Primary Recommendation:</span>
-                        <span className="font-bold text-emerald-900">
-                          {recommendationResult.primary_recommendation.material_name}
-                        </span>
-                      </div>
-                    )}
-                    {recommendationResult.alternative_recommendation && (
-                      <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                        <span className="text-slate-500 font-medium">Alternative Recommendation:</span>
-                        <span className="font-semibold text-slate-800">
-                          {recommendationResult.alternative_recommendation.material_name}
-                        </span>
-                      </div>
-                    )}
-                    {recommendationResult.explanation && (
-                      <div className="pt-2 text-slate-600 leading-relaxed italic bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
-                        "{recommendationResult.explanation.selection_rationale}"
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
-                    <span className="font-semibold block mb-0.5">Phase 4 Complete:</span>
-                    Input workstation is fully wired and verified with the backend engine. Candidate
-                    comparison radar charts, MCDA matrix inspection, and evidence provenance modals will
-                    be rendered in Phase 5.
-                  </div>
+                  <CommodityPicker
+                    commodities={commodities}
+                    selectedCommodityId={selectedCommodityId}
+                    loading={loadingCommodities}
+                    error={errors.commodity_id || null}
+                    onSelectCommodity={(id: string) => setSelectedCommodityId(id)}
+                    onRetry={fetchCommodities}
+                  />
                 </div>
-              )}
+
+                {/* Environmental & Distribution Conditions Card */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <div>
+                      <h2 className="text-base font-bold text-slate-900">
+                        2. Environmental & Supply Chain Conditions
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        Specify cold chain logistics, ambient storage, and distribution stressors
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-400">Step 2 of 3</span>
+                  </div>
+
+                  <EnvironmentalInputs
+                    shelfLifeDays={shelfLifeDays}
+                    storageType={storageType}
+                    storageTempC={storageTempC}
+                    storageRhPct={storageRhPct}
+                    transitStress={transitStress}
+                    onShelfLifeChange={setShelfLifeDays}
+                    onStorageTypeChange={handleStorageTypeChange}
+                    onStorageTempChange={setStorageTempC}
+                    onStorageRhChange={setStorageRhPct}
+                    onTransitStressChange={setTransitStress}
+                    errors={errors}
+                  />
+                </div>
+
+                {/* Property Overrides & Geometry Card */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      3. Overrides & Packaging Geometry
+                    </h3>
+                    <span className="text-xs font-semibold text-slate-400">Step 3 of 3</span>
+                  </div>
+
+                  <PropertyOverrides
+                    commodity={commodityDetail}
+                    moistureContentPct={moistureContentPct}
+                    waterActivityAw={waterActivityAw}
+                    fatContentPct={fatContentPct}
+                    ph={ph}
+                    respirationRateCo2={respirationRateCo2}
+                    packageWeightKg={packageWeightKg}
+                    packageAreaM2={packageAreaM2}
+                    sustainabilityPreference={sustainabilityPreference}
+                    onMoistureChange={setMoistureContentPct}
+                    onWaterActivityChange={setWaterActivityAw}
+                    onFatChange={setFatContentPct}
+                    onPhChange={setPh}
+                    onRespirationRateChange={setRespirationRateCo2}
+                    onPackageWeightChange={setPackageWeightKg}
+                    onPackageAreaChange={setPackageAreaM2}
+                    onSustainabilityPreferenceChange={setSustainabilityPreference}
+                    errors={errors}
+                  />
+                </div>
+
+                {/* Submission Button */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={submitting || loadingCommodities || !selectedCommodityId}
+                    className="w-full py-4 px-6 rounded-xl font-bold text-sm text-white bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 disabled:cursor-not-allowed shadow-sm transition flex items-center justify-center space-x-2 cursor-pointer"
+                  >
+                    {submitting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8H4z"
+                          />
+                        </svg>
+                        <span>Evaluating Barrier Permeation & Optimizing Candidates...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Generate Packaging Recommendations</span>
+                        <svg
+                          className="w-4 h-4 ml-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                          />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Right Column: Baseline Inspection Card (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="sticky top-24 space-y-6">
+                <BaselinePreviewCard
+                  commodity={commodityDetail}
+                  loading={loadingDetail}
+                />
+
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3 text-xs text-slate-500">
+                  <h4 className="font-bold text-slate-800 text-sm">Decision-Support Workflow</h4>
+                  <p className="leading-relaxed">
+                    1. Select commodity from the vetted knowledge catalog to inspect reference
+                    physicochemical parameters.
+                  </p>
+                  <p className="leading-relaxed">
+                    2. Configure temperature, humidity, shelf life, and transport stress profiles to
+                    calculate water vapor & oxygen transmission limits.
+                  </p>
+                  <p className="leading-relaxed">
+                    3. The recommendation engine evaluates candidate materials using ASTM D3985 / F1249
+                    standards and multi-criteria utility weighting.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
