@@ -8,11 +8,11 @@
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 5 Complete — Recommendation Dashboard & Results Display Verified**. Ready for **Phase 6: Multi-Criteria Decision & Trade-Off Engine**.
+- **Current Phase:** **Phase 6 Complete — Explainability & Evidence Traceability Verified**. Ready for **Phase 7: Fresh Produce & MAP Optimization**.
 - **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All calculations based on published food science principles and verified peer-reviewed formulas.
 - **Application Code Status:**
-  - Backend: 61 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`). Warning audit resolved 3 `HTTP_422_UNPROCESSABLE_ENTITY` deprecations by switching to `HTTP_422_UNPROCESSABLE_CONTENT`; 1 upstream Starlette `httpx2` testclient deprecation documented and harmless.
-  - Frontend: Production build and strict TypeScript check verified with 0 errors (`tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
+  - Backend: 61 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
+  - Frontend: Production build, strict TypeScript compilation, and 10 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
 - **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
 
 ---
@@ -249,7 +249,36 @@
 
 ---
 
-## 12. Next Implementation Phase
-- **Immediate Next Step:** **Phase 6 — Multi-Criteria Decision & Trade-Off Engine**.
-- **Scope of Phase 6:** Interactive MCDA weight customization UI, trade-off radar/spider charts, sensitivity analysis across barrier vs. sustainability vs. cost dimensions, and live re-ranking triggers.
+## 12. Phase 6 Explainability & Evidence Traceability Summary
+
+- **Architecture:** Complete user-facing explainability and scientific evidence traceability experience presenting structured rationale, decision constraints, disqualification reasoning, and bibliographic literature provenance directly from the backend domain engine.
+  - Zero duplicate recommendation logic in the client.
+  - Fully decoupled and transparent hierarchy:
+    1. Primary Recommendation Card
+    2. "Why this recommendation?" (dominant spoilage vector & selection rationale)
+    3. Governing Decision Factors & Packaging Constraints
+    4. Technical Engineering Specification Grid
+    5. Alternative Recommendation Card
+    6. Candidate Materials Comparison Matrix
+    7. Disqualified Candidates Log (why other candidates were ruled out)
+    8. Scientific Evidence Traceability Panel (resolving cited source IDs to title, authors, year, standard number, and scope notes)
+    9. Documented Engineering Assumptions Panel
+    10. Uncertainty Profile & Decision Status Confidence
+    11. Scientific Limitations & Boundaries Panel
+- **Evidence Retrieval & Traceability Strategy:**
+  - Surfaced citations strictly map to real seeded `EvidenceSource` records (`REF_ROBERTSON_2012`, `REF_ASTM_F1249`, `REF_ASTM_D3985`, `REF_KADER_2002`, `REF_FONSECA_2002`, `REF_USDA_HB66_2016`, etc.).
+  - Frontend utilizes memoized session cache (`evidenceCache`) to resolve individual citations via `GET /api/evidence/{reference_id}` on-demand, preventing redundant network queries.
+  - Built an accessible modal dialog displaying detailed citation metadata, publication year, author list, standard number, and verification notes.
+  - Graceful degradation: Unresolvable or missing evidence IDs display an explicit *"Unresolved Reference / Metadata unavailable"* notice without breaking page rendering or concealing the recommendation.
+- **Verification & Test Status:**
+  - Frontend Vitest suite: 10/10 automated tests passing covering rationale rendering, decision factors, disqualification expansion, evidence resolution, missing evidence fallback, assumptions, limitations, safety advisory, and uncertainty profile.
+  - Strict TypeScript check (`tsc -b --noEmit`) and Vite production build pass with 0 errors across 38 transformed modules.
+  - Backend regression: 61/61 pytest tests passing (100% pass rate).
+  - Ruff lint & format: 100% compliant (`ruff check`, `ruff format --check`).
+
+---
+
+## 13. Next Implementation Phase
+- **Immediate Next Step:** **Phase 7 — Fresh Produce & MAP Optimization**.
+- **Scope of Phase 7:** Specialized respirational dynamics UI, equilibrium headspace $\text{O}_2/\text{CO}_2$ window inspection, $Q_{10}$ temperature scaling visualization, and micro-perforation breathability requirements.
 

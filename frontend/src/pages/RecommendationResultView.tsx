@@ -6,7 +6,12 @@ import { TechnicalSpecificationGrid } from '../components/recommendation/Technic
 import { CandidateComparisonTable } from '../components/recommendation/CandidateComparisonTable';
 import { DisqualifiedCandidatesList } from '../components/recommendation/DisqualifiedCandidatesList';
 import { SafetyAdvisoryBanner } from '../components/recommendation/SafetyAdvisoryBanner';
+import { RecommendationReasonCard } from '../components/recommendation/RecommendationReasonCard';
+import { DecisionFactorsCard } from '../components/recommendation/DecisionFactorsCard';
+import { EvidenceTracePanel } from '../components/recommendation/EvidenceTracePanel';
+import { AssumptionsPanel } from '../components/recommendation/AssumptionsPanel';
 import { UncertaintyNotesCard } from '../components/recommendation/UncertaintyNotesCard';
+import { LimitationsPanel } from '../components/recommendation/LimitationsPanel';
 import type { RecommendationResponse, RecommendationCreateRequest } from '../types/api';
 
 interface RecommendationResultViewProps {
@@ -22,9 +27,14 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
   onModifyInputs,
   onNewEvaluation,
 }) => {
+  const explanation = result.explanation;
+  const citedSources = explanation?.cited_evidence_sources || [];
+  const assumptions = explanation?.documented_assumptions || [];
+  const limitations = explanation?.scientific_limitations || [];
+
   return (
     <div className="space-y-8 animate-fade-in pb-12">
-      {/* Top Banner / Breadcrumb & Action bar */}
+      {/* 1. Header / Breadcrumb & Action bar */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center space-x-3">
@@ -33,7 +43,8 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
             </h1>
           </div>
           <p className="text-xs text-slate-500 font-mono">
-            Session Request ID: {result.request_id} • Evaluated: {new Date(result.created_at).toLocaleString()}
+            Session Request ID: {result.request_id} • Evaluated:{' '}
+            {new Date(result.created_at).toLocaleString()}
           </p>
         </div>
 
@@ -70,7 +81,9 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
             <span className="font-semibold text-slate-700 block">Submitted Evaluation Context:</span>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
               <span>Shelf Life: {submittedInput.desired_shelf_life_days} days</span>
-              <span>Regime: {submittedInput.storage_type} ({submittedInput.storage_temp_c}°C)</span>
+              <span>
+                Regime: {submittedInput.storage_type} ({submittedInput.storage_temp_c}°C)
+              </span>
               <span>RH: {submittedInput.storage_rh_pct}%</span>
               <span>Stress: {submittedInput.transit_stress.replace('_', ' ')}</span>
             </div>
@@ -78,36 +91,56 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
         )}
       </div>
 
-      {/* Contextual Food Safety Advisory (if applicable) */}
+      {/* Contextual Food Safety Advisory (if returned) */}
       <SafetyAdvisoryBanner advisory={result.safety_advisory} />
 
-      {/* Primary Recommended Material Card */}
+      {/* 2. Primary Recommendation Card */}
       <PrimaryRecommendationCard
         primary={result.primary_recommendation}
         targetSpecs={result.target_specifications}
       />
 
-      {/* Technical Specifications Grid (OTR, WVTR, Gauge, Rationale) */}
+      {/* 3. Why This Recommendation? (Dominant spoilage driver & selection rationale) */}
+      <RecommendationReasonCard
+        explanation={explanation}
+      />
+
+      {/* 4. Governing Decision Factors & Packaging Constraints */}
+      <DecisionFactorsCard
+        explanation={explanation}
+        targetSpecs={result.target_specifications}
+      />
+
+      {/* 5. Technical Specifications Grid (OTR, WVTR, Gauge, Rationale) */}
       <TechnicalSpecificationGrid targetSpecs={result.target_specifications} />
 
-      {/* Alternative Recommendation Card */}
+      {/* 6. Alternative Recommendation Card */}
       {result.alternative_recommendation && (
         <div className="space-y-2">
           <AlternativeRecommendationCard alternative={result.alternative_recommendation} />
         </div>
       )}
 
-      {/* Candidate Comparison Matrix */}
+      {/* 7. Candidate Comparison Matrix */}
       <CandidateComparisonTable candidates={result.ranked_candidates} />
 
-      {/* Disqualified Candidates Explainability Log */}
+      {/* 8. Disqualified Candidates (Why other candidates were not selected) */}
       <DisqualifiedCandidatesList disqualified={result.disqualified_candidates} />
 
-      {/* Scientific Uncertainty & Assumptions */}
+      {/* 9. Scientific Evidence Traceability Panel & Citation Modal */}
+      <EvidenceTracePanel citedSourceIds={citedSources} />
+
+      {/* 10. Documented Engineering Assumptions Panel */}
+      <AssumptionsPanel assumptions={assumptions} />
+
+      {/* 11. Uncertainty Profile & Decision Status */}
       <UncertaintyNotesCard
         uncertaintyNotes={result.uncertainty_notes}
-        explanation={result.explanation}
+        status={result.status}
       />
+
+      {/* 12. Scientific Limitations & Boundaries */}
+      <LimitationsPanel limitations={limitations} />
     </div>
   );
 };

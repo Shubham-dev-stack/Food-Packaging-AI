@@ -7,9 +7,12 @@ import type {
   ApiErrorResponse,
   CommodityBriefResponse,
   CommodityDetailResponse,
+  EvidenceSourceResponse,
   RecommendationCreateRequest,
   RecommendationResponse,
 } from '../types/api';
+
+const evidenceCache = new Map<string, EvidenceSourceResponse>();
 
 export class ApiError extends Error {
   public readonly status: number;
@@ -90,6 +93,27 @@ export const api = {
    */
   async getRecommendation(requestId: string): Promise<RecommendationResponse> {
     return request<RecommendationResponse>(`/api/recommendations/${encodeURIComponent(requestId)}`);
+  },
+
+  /**
+   * Retrieve evidence source by reference ID with in-memory session caching.
+   */
+  async getEvidence(referenceId: string): Promise<EvidenceSourceResponse> {
+    if (evidenceCache.has(referenceId)) {
+      return evidenceCache.get(referenceId)!;
+    }
+    const data = await request<EvidenceSourceResponse>(`/api/evidence/${encodeURIComponent(referenceId)}`);
+    evidenceCache.set(referenceId, data);
+    return data;
+  },
+
+  /**
+   * Retrieve all bibliographic evidence sources.
+   */
+  async getEvidenceList(): Promise<EvidenceSourceResponse[]> {
+    const list = await request<EvidenceSourceResponse[]>('/api/evidence');
+    list.forEach((item) => evidenceCache.set(item.reference_id, item));
+    return list;
   },
 
   /**
