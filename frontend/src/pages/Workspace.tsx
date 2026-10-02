@@ -339,6 +339,7 @@ export const Workspace: React.FC = () => {
           <RecommendationResultView
             result={recommendationResult}
             submittedInput={lastSubmittedPayload}
+            commodityDetail={commodityDetail}
             onModifyInputs={() => setCurrentStep('input')}
             onNewEvaluation={handleResetForNewEvaluation}
           />

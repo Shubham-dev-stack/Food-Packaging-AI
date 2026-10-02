@@ -12,11 +12,17 @@ import { EvidenceTracePanel } from '../components/recommendation/EvidenceTracePa
 import { AssumptionsPanel } from '../components/recommendation/AssumptionsPanel';
 import { UncertaintyNotesCard } from '../components/recommendation/UncertaintyNotesCard';
 import { LimitationsPanel } from '../components/recommendation/LimitationsPanel';
-import type { RecommendationResponse, RecommendationCreateRequest } from '../types/api';
+import { FreshProduceDashboard } from '../components/recommendation/fresh-produce/FreshProduceDashboard';
+import type {
+  RecommendationResponse,
+  RecommendationCreateRequest,
+  CommodityDetailResponse,
+} from '../types/api';
 
 interface RecommendationResultViewProps {
   result: RecommendationResponse;
   submittedInput: RecommendationCreateRequest | null;
+  commodityDetail?: CommodityDetailResponse | null;
   onModifyInputs: () => void;
   onNewEvaluation: () => void;
 }
@@ -24,6 +30,7 @@ interface RecommendationResultViewProps {
 export const RecommendationResultView: React.FC<RecommendationResultViewProps> = ({
   result,
   submittedInput,
+  commodityDetail,
   onModifyInputs,
   onNewEvaluation,
 }) => {
@@ -98,6 +105,13 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
       <PrimaryRecommendationCard
         primary={result.primary_recommendation}
         targetSpecs={result.target_specifications}
+      />
+
+      {/* 2.5 Fresh Produce Respiration & MAP Optimization (Active for respiring crops) */}
+      <FreshProduceDashboard
+        commodityDetail={commodityDetail ?? null}
+        targetSpecs={result.target_specifications}
+        storageTempC={submittedInput?.storage_temp_c ?? 4.0}
       />
 
       {/* 3. Why This Recommendation? (Dominant spoilage driver & selection rationale) */}
