@@ -57,6 +57,19 @@ The recommendation engine must pass 7 distinct categories of unit tests:
 - **State Transitions:** E2E tests verify that submitting a query transitions through the loading skeleton to the populated results grid in $\le 1.0\text{ second}$.
 - **Responsive Layout:** Visual regression checks verify that the layout renders cleanly without element clipping at 375px mobile viewport width.
 
+### 2.4 Recommendation Invariants & Reliability Guarantees (Phase 9)
+The recommendation pipeline enforces 10 strict mathematical and architectural invariants (`backend/tests/test_recommendation_reliability.py`):
+1. **Invariant 1 (Qualification Purity):** Every ranked candidate is verified as `ELIGIBLE` or `CONDITIONALLY_ELIGIBLE`.
+2. **Invariant 2 (Disqualification Traceability):** Every disqualified candidate has at least one documented rejection reason citing the failed ASTM threshold.
+3. **Invariant 3 (Rank Contiguity):** Candidate ranks are contiguous and deterministic ($1, 2, \dots, N$).
+4. **Invariant 4 (Primary Selection Authority):** Primary recommendation is strictly the first ranked qualified candidate ($rank = 1$).
+5. **Invariant 5 (Alternative Distinctness):** Alternative recommendation, when present, is a distinct qualified candidate with superior circularity or lower cost.
+6. **Invariant 6 (Composite Utility Conservation):** $U(m) = w_b \cdot S_b + w_s \cdot S_s + w_c \cdot S_c$ equals the exact sum of contribution fields within documented 4-decimal rounding.
+7. **Invariant 7 (Weight Normalization):** Applied weights strictly sum to $1.0000 \pm 0.0001$.
+8. **Invariant 8 (Weight Attribution):** Applied weights strictly correspond to the selected `OptimizationPreference` preset.
+9. **Invariant 9 (Constraint Immunity):** Changing soft preference weights alters candidate order only; disqualified candidates can never be rescued or promoted.
+10. **Invariant 10 (Research Integrity):** Produce lacking verified MAP mixtures or uncharacterized commodities explicitly output `RESEARCH_REQUIRED` / `INSUFFICIENT_EVIDENCE` without synthesizing fabricated gas compositions.
+
 ---
 
 ## 3. Security Strategy & Threat Mitigations

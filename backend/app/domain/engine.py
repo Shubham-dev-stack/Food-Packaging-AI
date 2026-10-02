@@ -150,6 +150,20 @@ class RecommendationEngine:
                         "ventilation. Hermetic or gas packaging causes physiological decay "
                         "(soft rot/blackheart)."
                     )
+                elif map_conf.suitability_status == "suitable" and (
+                    map_conf.recommended_o2_min_pct is None
+                    or map_conf.recommended_co2_max_pct is None
+                ):
+                    uncertainties.append(
+                        "Specific equilibrium MAP gas compositions (O2/CO2) for "
+                        f"'{commodity.common_name}' are unverified in published "
+                        "post-harvest compendiums. [RESEARCH REQUIRED]."
+                    )
+            else:
+                uncertainties.append(
+                    f"Optimal equilibrium MAP headspace gas mixtures for '{commodity.common_name}' "
+                    "are not registered in the reference catalog. [RESEARCH REQUIRED]."
+                )
 
         # 3. Dry / Processed Goods Branch
         else:
@@ -163,11 +177,23 @@ class RecommendationEngine:
                 gauge_config=actual_gauge_cfg,
             )
 
-        # 4. Storage mode validation
+        # 4. Storage mode and boundary validations
         if inp.storage_type == StorageType.FROZEN and inp.storage_temp_c > 0.0:
             uncertainties.append(
                 f"Conflicting inputs: storage type is 'frozen' but temperature is "
                 f"{inp.storage_temp_c} C (> 0 C)."
+            )
+        if inp.desired_shelf_life_days > 365:
+            uncertainties.append(
+                f"Extended target shelf life ({inp.desired_shelf_life_days} days): "
+                "Steady-state permeation assumptions carry elevated uncertainty over multi-year "
+                "periods due to real-world barrier degradation, seal relaxation, and pinholing."
+            )
+        if not is_respiring and inp.storage_temp_c > 40.0:
+            uncertainties.append(
+                f"Elevated ambient storage temperature ({inp.storage_temp_c} C): Accelerated "
+                "Arrhenius permeation and polymer chain relaxation may degrade effective barrier "
+                "performance compared to standard laboratory test conditions (ASTM F1249 / D3985)."
             )
 
         # 5. Candidate Filtering

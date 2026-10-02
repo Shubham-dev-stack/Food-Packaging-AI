@@ -115,7 +115,7 @@ def rank_candidates(
         cand.composite_utility_score = round(utility, 4)
 
     # Sort descending: Fully ELIGIBLE candidates precede CONDITIONALLY_ELIGIBLE,
-    # then rank by composite utility score (tie-break on sustainability, then cost)
+    # then rank by utility (tie-break on sustainability, cost, and material_id)
     ranked = sorted(
         candidates,
         key=lambda c: (
@@ -123,6 +123,7 @@ def rank_candidates(
             c.composite_utility_score,
             c.sustainability_score,
             c.cost_score,
+            c.material_id,
         ),
         reverse=True,
     )

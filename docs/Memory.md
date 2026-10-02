@@ -8,11 +8,11 @@
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 8 Complete — Trade-Off & Multi-Criteria Optimization Verified**. Ready for **Phase 9: End-to-End Testing & Security Hardening**.
-- **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All multi-criteria ranking calculations use transparent linear composite utility functions with explicit barrier, circularity, and cost weighting presets.
+- **Current Phase:** **Phase 9 Complete — Decision Validation, Edge-Case Hardening & Recommendation Reliability Verified**. Ready for **Phase 10: Deployment Preparation**.
+- **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All multi-criteria ranking calculations enforce 10 formal invariants, complete tie-breaking determinism, and explicit degradation uncertainty models for boundary temperatures and multi-year durations.
 - **Application Code Status:**
-  - Backend: 69 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
-  - Frontend: Production build, strict TypeScript compilation, and 25 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
+  - Backend: 80 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
+  - Frontend: Production build, strict TypeScript compilation, and 31 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
 - **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
 
 ---
@@ -354,8 +354,37 @@
 
 ---
 
-## 15. Next Implementation Phase
-- **Immediate Next Step:** **Phase 9 — Security & Reliability Hardening / End-to-End Testing**.
-- **Scope of Phase 9:** Dependency vulnerability scan, strict CORS and security headers, input sanitization, global error boundaries, and end-to-end integration workflows.
+## 15. Phase 9 Decision Validation, Edge-Case Hardening & Recommendation Reliability Summary
+
+- **Architecture:** Hardened validation, edge-case coverage, and recommendation invariants across backend domain and frontend UI:
+  - **10 Core Invariants Formalized and Verified (`backend/tests/test_recommendation_reliability.py`):**
+    1. Qualification Purity: Every ranked candidate is verified as `ELIGIBLE` or `CONDITIONALLY_ELIGIBLE`.
+    2. Disqualification Traceability: Every disqualified candidate retains at least one documented rejection reason.
+    3. Contiguous Deterministic Ranking: Rank values are continuous integers $1, 2, \dots, N$.
+    4. Primary Selection Authority: Primary recommendation is strictly the first ranked qualified candidate ($rank = 1$).
+    5. Alternative Distinctness: Alternative recommendation is a distinct qualified candidate with superior circularity or lower cost.
+    6. Composite Utility Conservation: $U = w_b \cdot S_b + w_s \cdot S_s + w_c \cdot S_c$ matches the exact sum of contributions within rounding.
+    7. Weight Normalization: Applied weights strictly sum to 1.0.
+    8. Weight Attribution: Applied weights correspond to selected preference.
+    9. Constraint Immunity: Soft preference weights only alter candidate order; disqualified candidates can never be rescued.
+    10. Research Integrity: Produce lacking verified MAP mixtures or uncharacterized commodities explicitly output `RESEARCH_REQUIRED` / `INSUFFICIENT_EVIDENCE` without fabricating gas compositions.
+  - **Boundary & Degradation Models:**
+    - Attached uncertainty warnings for storage durations $>365$ days (barrier aging, pinholing, seal relaxation).
+    - Attached uncertainty warnings for elevated non-respiring storage temperatures $>40^\circ\text{C}$ (accelerated Arrhenius permeation and polymer chain relaxation).
+    - Added unverified MAP gas mixture uncertainty handling for produce lacking documented gas targets in reference literature.
+    - Tie-breaking determinism enforced down to `material_id`.
+  - **Decision-Support Boundary Formalization:**
+    - Updated limitations in `backend/app/domain/explanation.py` with explicit non-certification disclaimer: recommendations represent engineering estimates and do not constitute accredited laboratory certification, regulatory approval, or guaranteed shelf life.
+  - **Frontend Reliability & Empty States:**
+    - 6 new unit tests in `frontend/src/tests/ReliabilityHardening.test.tsx` verifying primary null states, empty candidate tables, StatusBadge styling, and boundary notices.
+- **Verification & Test Status:**
+  - Backend: 80 automated pytest tests passing (100% pass rate). Ruff check & format clean (0 errors across 57 files).
+  - Frontend: 31 vitest unit tests passing across 4 test suites. Strict TypeScript check (`tsc -b --noEmit`) passes with 0 errors. Vite production build passes with 0 errors.
+
+---
+
+## 16. Next Implementation Phase
+- **Immediate Next Step:** **Phase 10 — Deployment Preparation**.
+- **Scope of Phase 10:** Standalone Docker packaging, container build verification, environment configuration, and local startup automation.
 
 

@@ -150,12 +150,17 @@ def synthesize_explanation(
     limitations = [
         (
             "Recommendations represent engineering decision-support estimates and do NOT "
-            "constitute accredited laboratory test validation or shelf-life certification."
+            "constitute accredited laboratory test validation, regulatory certification, or "
+            "shelf-life guarantees."
         ),
         (
             "Standard test methods: OTR measured under ASTM D3985-17 (23 C, 0% RH); "
             "WVTR measured under ASTM F1249-20 (37.8 C, 90% RH). Commercial implementation "
             "requires physical testing (ASLT) and regulatory food migration compliance."
+        ),
+        (
+            "Active prototype ranking weights model user preference sensitivity; they do not "
+            "represent scientifically optimal constants or certified procurement advice."
         ),
     ]
 
