@@ -1,8 +1,10 @@
 """Multi-Criteria Decision Analysis (MCDA) utility ranking for viable candidate materials."""
 
 from backend.app.domain.types import (
+    SUSTAINABILITY_PRIORITY_WEIGHTS,
     CandidateEligibility,
     CandidateEvaluation,
+    RankingWeightsConfig,
     TargetSpecifications,
 )
 
@@ -59,9 +61,12 @@ def rank_candidates(
     candidates: list[CandidateEvaluation],
     specs: TargetSpecifications,
     prioritize_sustainability: bool = False,
-    custom_weights: tuple[float, float, float] | None = None,
+    weights_config: RankingWeightsConfig | None = None,
 ) -> tuple[list[CandidateEvaluation], CandidateEvaluation | None, CandidateEvaluation | None]:
     """Score and rank viable candidate materials using multi-attribute utility.
+
+    Decision-support prototype baseline weights: 50% barrier, 30% sustainability, 20% cost.
+    (Matches docs/AI_Recommendation_Engine.md Section 3.5 [PROTOTYPE ASSUMPTION]).
 
     Returns:
         (ranked_candidates, primary_candidate, eco_alternative_candidate)
@@ -70,12 +75,16 @@ def rank_candidates(
         return [], None, None
 
     # Configurable weights [PROTOTYPE ASSUMPTION]
-    if custom_weights:
-        w_barrier, w_sust, w_cost = custom_weights
+    if weights_config is not None:
+        cfg = weights_config
     elif prioritize_sustainability:
-        w_barrier, w_sust, w_cost = (0.40, 0.50, 0.10)
+        cfg = SUSTAINABILITY_PRIORITY_WEIGHTS
     else:
-        w_barrier, w_sust, w_cost = (0.50, 0.30, 0.20)
+        cfg = RankingWeightsConfig()
+
+    w_barrier = cfg.w_barrier
+    w_sust = cfg.w_sustainability
+    w_cost = cfg.w_cost
 
     # Score each candidate
     for cand in candidates:
@@ -90,10 +99,16 @@ def rank_candidates(
         )
         cand.composite_utility_score = round(utility, 4)
 
-    # Sort descending by composite utility score (tie-break on sustainability, then cost)
+    # Sort descending: Fully ELIGIBLE candidates precede CONDITIONALLY_ELIGIBLE,
+    # then rank by composite utility score (tie-break on sustainability, then cost)
     ranked = sorted(
         candidates,
-        key=lambda c: (c.composite_utility_score, c.sustainability_score, c.cost_score),
+        key=lambda c: (
+            c.eligibility == CandidateEligibility.ELIGIBLE,
+            c.composite_utility_score,
+            c.sustainability_score,
+            c.cost_score,
+        ),
         reverse=True,
     )
 

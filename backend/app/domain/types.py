@@ -64,6 +64,48 @@ class RecommendationInput:
 
 
 @dataclass(frozen=True)
+class TransitGaugeConfig:
+    """Configurable nominal transit thickness baselines [PROTOTYPE ASSUMPTION].
+
+    Actual mechanical puncture and flex-crack resistance depend on resin modulus,
+    dart impact resistance (ASTM D1709), and secondary shipping carton integrity.
+    """
+
+    local_standard_um: float = 30.0
+    long_haul_refrigerated_um: float = 45.0
+    rough_terrain_unpaved_um: float = 65.0
+    foil_backing_min_um: float = 70.0
+
+
+@dataclass(frozen=True)
+class RankingWeightsConfig:
+    """Configurable weights for Multi-Attribute Utility Ranking [PROTOTYPE ASSUMPTION].
+
+    Default prototype baseline matches docs/AI_Recommendation_Engine.md Section 3.5:
+        w_barrier = 0.50 (50%)
+        w_sustainability = 0.30 (30%)
+        w_cost = 0.20 (20%)
+    """
+
+    w_barrier: float = 0.50
+    w_sustainability: float = 0.30
+    w_cost: float = 0.20
+
+    def __post_init__(self) -> None:
+        total = self.w_barrier + self.w_sustainability + self.w_cost
+        if not (0.999 <= total <= 1.001):
+            raise ValueError(f"Ranking weights must sum to 1.0, got {total:.4f}")
+
+
+# Indicative user preference scenario (prototype weighting, not scientifically optimal)
+SUSTAINABILITY_PRIORITY_WEIGHTS = RankingWeightsConfig(
+    w_barrier=0.40,
+    w_sustainability=0.45,
+    w_cost=0.15,
+)
+
+
+@dataclass(frozen=True)
 class TargetSpecifications:
     """Estimated target engineering specification ranges in standard ASTM units."""
 

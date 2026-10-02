@@ -97,15 +97,42 @@
 ## 5. Phase 2 Domain Physics & Recommendation Engine Summary
 
 - **Engine Package (`backend/app/domain/`):**
-  1. `types.py`: Domain data definitions, immutable dataclasses, and standard enums (`RecommendationStatus`, `CandidateEligibility`, `StorageType`, `TransitStress`).
+  1. `types.py`: Domain data definitions, immutable dataclasses, standard enums (`RecommendationStatus`, `CandidateEligibility`, `StorageType`, `TransitStress`), `TransitGaugeConfig` for configurable mechanical thickness baselines, and `RankingWeightsConfig` enforcing sum=1.0 validation.
   2. `units.py`: Strict physical unit conversions ($\mu\text{m} \leftrightarrow \text{mil}$, $^\circ\text{C} \leftrightarrow \text{K}$), Tetens saturation vapor pressure equation $p_{\text{sat}}(T)$ with separate water and ice coefficients, and vapor pressure gradient calculation $\Delta p_w$.
-  3. `barrier.py`: Analytical steady-state moisture barrier equation (Robertson Eq. 78 mass-transfer approximation) bounded by empirical critical water activity intervals; lipid oxidation and high-acid oxygen barrier target rules; transit stress mechanical thickness derivation.
-  4. `respiration.py`: Fresh produce respiration kinetics scaled via $Q_{10}$ exponential model; equilibrium oxygen transmission rate ($\text{OTR}_{\text{eq}}$) calculation; micro-perforation and gas venting necessity evaluation.
-  5. `safety.py`: Mandatory Food Safety Advisory interceptor identifying reduced-oxygen packaging hazards (*Clostridium botulinum* germination in low-acid $pH \ge 4.6$ and high moisture $a_w \ge 0.92$) in compliance with FDA 21 CFR 114 and FSSAI packaging guidelines.
-  6. `filtering.py`: Deterministic constraint satisfaction filtering eliminating candidates with severe hypoxia risk, missing micro-perforations, insufficient WVTR/OTR, sub-zero embrittlement (neat PLA), or poor heat sealability.
-  7. `ranking.py`: Multi-Attribute Utility Analysis (MCDA) balancing barrier safety margin ($w=0.50$ baseline, $0.40$ sustainability-prioritized), circularity/sustainability score ($w=0.25$ baseline, $0.45$ prioritized), and normalized cost index ($w=0.25$ baseline, $0.15$ prioritized).
-  8. `explanation.py`: Deterministic explainability synthesis generating human-readable dominant spoilage drivers, critical storage factors, primary/alternative selection rationales, candidate disqualification audits with explicit rejection reasons, prototype modeling assumptions, and full bibliographic citation traceability.
+  3. `barrier.py`:
+     - Added `calculate_mass_balance_moisture_flux` deriving required moisture flux step-by-step from product geometry and shelf life in $[g / (m^2 \cdot \text{day})]$.
+     - Formally distinguished mass-balance moisture flux, linearized permeance scaling `[PROTOTYPE ASSUMPTION]`, and evidence-backed empirical target ranges (Robertson 2012 / Labuza 1998).
+     - Labeled OTR cutoffs as `[PROTOTYPE HEURISTIC: Robertson 2012 / Marsh & Bugusu 2007]` with ASTM D3985-17 standard test conditions (23°C, 0% RH).
+     - Made transit gauge calculation configurable via `TransitGaugeConfig` with explicit `[PROTOTYPE ASSUMPTION]` labels and ASTM F1306/D4169 test caveats.
+  4. `respiration.py`:
+     - Fresh produce respiration kinetics scaled via $Q_{10}$ exponential model linked directly to Fonseca 2002.
+     - Coupled equilibrium oxygen transmission rate ($\text{OTR}_{\text{eq}}$) calculation based on package surface area and produce mass.
+     - Micro-perforation evaluation updated to reflect film permselectivity $\beta = \text{CO}_2/\text{O}_2 \approx 3\text{--}6$ relative to commodity $\text{CO}_2$ tolerance and transmission capacity.
+  5. `safety.py`:
+     - Reframed ROP evaluation as an educational, contextual advisory: `[CONTEXTUAL FOOD SAFETY ADVISORY - REDUCED-OXYGEN PACKAGING]`.
+     - Explicitly separated contextual hazard flags (*Clostridium botulinum* germination in low-acid $pH \ge 4.6$ and high moisture $a_w \ge 0.92$) from regulatory certification, declaring that the software does NOT certify commercial food safety compliance (21 CFR 114 / FSSAI).
+  6. `filtering.py`:
+     - Replaced hard produce OTR cutoffs with coupled hypoxia risk check ($bp.\text{otr} < 0.20 \times \text{OTR}_{\text{eq}}$ for continuous dense films).
+     - Converted dense film disqualifications for respiring produce to `CONDITIONALLY_ELIGIBLE` with perforation/venting requirements.
+     - Removed arbitrary `shelf_life > 60` threshold for light protection; light barrier conditionality now triggered directly by documented commodity photosensitivity.
+     - Converted sub-zero neat PLA rejection into a qualitative conditionality (`CONDITIONALLY_ELIGIBLE`), noting low glass transition temperature $T_g \approx 55\text{--}60^\circ\text{C}$ and requiring ASTM D1709 impact validation.
+  7. `ranking.py`:
+     - Implemented configurable `RankingWeightsConfig` defaulting to the 50/30/20 baseline from `docs/AI_Recommendation_Engine.md` Section 3.5 (Barrier Safety Margin $w_{\text{barrier}} = 0.50$, Sustainability $w_{\text{sust}} = 0.30$, Economic Index $w_{\text{cost}} = 0.20$).
+     - Provided `SUSTAINABILITY_PRIORITY_WEIGHTS` preset (0.40/0.45/0.15).
+     - Implemented candidate sorting precedence ensuring fully `ELIGIBLE` candidates always rank ahead of `CONDITIONALLY_ELIGIBLE` candidates before utility score sorting.
+  8. `explanation.py`:
+     - Deterministic explainability synthesis generating human-readable dominant spoilage drivers, critical storage factors, primary/alternative selection rationales, candidate disqualification audits with explicit rejection reasons, and prototype modeling assumptions.
+     - Citation consistency enforced: Robertson edition corrected to 2012 (`REF_ROBERTSON_2012`), ASTM standards updated to ASTM D3985-17 and ASTM F1249-20.
   9. `engine.py`: `RecommendationEngine.evaluate()` coordinator managing the end-to-end evaluation pipeline deterministically with zero database or network side effects.
+
+- **Scientific Guardrail Patch Summary:**
+  - Audit verified dimensional correctness and separated mass balance flux from material permeance.
+  - Replaced universal hard cutoffs with prototype assumptions/heuristics labeled `[PROTOTYPE ASSUMPTION]` or `[PROTOTYPE HEURISTIC]`.
+  - Replaced arbitrary light barrier threshold with documented commodity photo-sensitivity.
+  - Coupled produce respiration to package area, mass, and film permselectivity.
+  - Made ranking weights configurable with validated baseline weights (50/30/20).
+  - Ensured all generated recommendation citations resolve to existing seeded `EvidenceSource` records.
+  - Test suite expanded to 41 automated tests in backend (`pytest` with 100% pass rate: 8 data models, 14 physics unit tests, 2 health checks, 10 engine integration scenarios, 7 seeding idempotency tests). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
 
 ---
 
@@ -117,9 +144,10 @@
 ---
 
 ## 7. Active Research Gaps & Open Scientific Questions
-1. Sizing mass-transfer equations for irregular non-pouch packaging geometries (e.g. thermoformed trays with lidding films).
-2. Cultivar-specific $Q_{10}$ factors under severe ambient temperature abuse ($>25^\circ\text{C}$).
+1. Analytical and numerical sizing of mass-transfer equations for irregular non-pouch packaging geometries (e.g. thermoformed trays with lidding films, rigid bottles).
+2. Cultivar-specific $Q_{10}$ factors and respiration rates under severe ambient temperature abuse ($>25^\circ\text{C}$).
 3. Threshold pinhole development in thin aluminum foil ($<12\ \mu\text{m}$) during long-haul rough-terrain transit.
+4. Non-linear temperature-dependent water vapor permeation in hydrophilic bio-based polymers (e.g., starch blends, chitosan).
 
 ---
 

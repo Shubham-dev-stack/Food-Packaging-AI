@@ -12,11 +12,13 @@ from backend.app.domain.respiration import (
 from backend.app.domain.safety import evaluate_food_safety_advisory
 from backend.app.domain.types import (
     CandidateEligibility,
+    RankingWeightsConfig,
     RecommendationInput,
     RecommendationResultDomain,
     RecommendationStatus,
     StorageType,
     TargetSpecifications,
+    TransitGaugeConfig,
 )
 from backend.app.models.commodity import Commodity
 from backend.app.models.material import PackagingMaterial
@@ -30,9 +32,12 @@ class RecommendationEngine:
         commodity: Commodity,
         materials: list[PackagingMaterial],
         inp: RecommendationInput,
+        weights_config: RankingWeightsConfig | None = None,
+        gauge_config: TransitGaugeConfig | None = None,
     ) -> RecommendationResultDomain:
         """Execute complete recommendation pipeline for a given commodity and user input."""
         uncertainties: list[str] = []
+        actual_gauge_cfg = gauge_config if gauge_config is not None else TransitGaugeConfig()
 
         # 1. Commodity baseline property resolution
         prop = commodity.property
@@ -100,7 +105,7 @@ class RecommendationEngine:
             )
             uncertainties.extend(resp_warnings)
 
-            # Calculate equilibrium OTR demand
+            # Calculate equilibrium OTR demand (Coupled mass balance)
             eq_otr = calculate_equilibrium_required_otr(
                 respiration_rate_co2=adj_rate,
                 package_weight_kg=inp.package_weight_kg,
@@ -112,6 +117,7 @@ class RecommendationEngine:
                 respiration_class=resp_ref.respiration_class,
                 respiration_rate_co2=adj_rate,
                 max_tolerable_co2_pct=resp_ref.max_tolerable_co2_pct,
+                eq_otr=eq_otr,
             )
 
             specs = TargetSpecifications(
@@ -126,7 +132,7 @@ class RecommendationEngine:
                 ),
                 target_otr_rationale=(
                     f"Equilibrium O2 demand calculated at {inp.storage_temp_c} C: "
-                    f"OTR >= {eq_otr:.1f} cm3/(m2*day*atm)."
+                    f"OTR >= {eq_otr:.1f} cm3/(m2*day*atm) under coupled mass balance."
                 ),
                 thickness_rationale="Gauge balanced for breathable web stability (30-40 um).",
             )
@@ -152,6 +158,7 @@ class RecommendationEngine:
                 ph=ph,
                 is_respiring=False,
                 is_light_sensitive=prop.is_light_sensitive,
+                gauge_config=actual_gauge_cfg,
             )
 
         # 4. Storage mode validation
@@ -169,6 +176,7 @@ class RecommendationEngine:
             candidates=viable,
             specs=specs,
             prioritize_sustainability=inp.user_sustainability_preference,
+            weights_config=weights_config,
         )
 
         # 7. Food Safety Advisory Interceptor

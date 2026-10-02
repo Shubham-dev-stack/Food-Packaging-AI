@@ -125,23 +125,37 @@ def synthesize_explanation(
     if alternative and alternative.evidence_reference_id:
         sources.add(alternative.evidence_reference_id)
 
+    # Add standards reference IDs based on context
+    if is_respiring:
+        sources.add("REF_KADER_2002")
+        sources.add("REF_FONSECA_2002")
+    else:
+        sources.add("REF_ROBERTSON_2012")
+        sources.add("REF_ASTM_F1249")
+        sources.add("REF_ASTM_D3985")
+
     assumptions = [
-        "Steady-state isothermal mass transfer modeling (no dynamic thermal cycling).",
+        "[PROTOTYPE ASSUMPTION] Steady-state isothermal mass transfer (no thermal cycling).",
         (
-            f"Standard pouch geometry baseline ({inp.package_weight_kg * 1000:.0f}g food "
-            f"per {inp.package_area_m2:.2f} m2 film area)."
+            f"[PROTOTYPE ASSUMPTION] Standard pouch geometry baseline "
+            f"({inp.package_weight_kg * 1000:.0f}g food / {inp.package_area_m2:.2f} m2 area)."
         ),
-        "Relative economic index normalized to baseline LDPE film (= 1.0).",
+        (
+            "[PROTOTYPE ASSUMPTION] Linear water vapor permeance scaling across vapor pressure "
+            "gradient."
+        ),
+        "[PROTOTYPE ASSUMPTION] Relative economic index normalized to baseline LDPE film (= 1.0).",
     ]
 
     limitations = [
         (
             "Recommendations represent engineering decision-support estimates and do NOT "
-            "constitute accredited laboratory test validation."
+            "constitute accredited laboratory test validation or shelf-life certification."
         ),
         (
-            "Physical shelf-life testing (ASLT) and migration compliance (FSSAI/FDA/EU) are "
-            "mandatory before commercial marketing."
+            "Standard test methods: OTR measured under ASTM D3985-17 (23 C, 0% RH); "
+            "WVTR measured under ASTM F1249-20 (37.8 C, 90% RH). Commercial implementation "
+            "requires physical testing (ASLT) and regulatory food migration compliance."
         ),
     ]
 

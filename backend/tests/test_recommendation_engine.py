@@ -167,7 +167,8 @@ def test_fresh_respiring_produce_broccoli(seeded_db):
 def test_frozen_storage_embrittlement_check(seeded_db):
     """Scenario: Frozen Green Peas (COMM_FROZEN_PEAS).
 
-    Storage mode frozen (-18 C). Neat PLA must be rejected for sub-zero embrittlement.
+    Storage mode frozen (-18 C). PLA-25 is disqualified because its high WVTR (190 g)
+    exceeds the freezer desiccation limit (<= 18.0 g/(m2*day)).
     """
     comm = CommodityRepository.get_by_id(seeded_db, "COMM_FROZEN_PEAS")
     materials = MaterialRepository.list_all(seeded_db)
@@ -186,7 +187,29 @@ def test_frozen_storage_embrittlement_check(seeded_db):
     disq_codes = {d.trade_code for d in result.disqualified_candidates}
     assert "PLA-25" in disq_codes
     pla_disq = next(d for d in result.disqualified_candidates if d.trade_code == "PLA-25")
-    assert any("embrittlement" in r.lower() for r in pla_disq.rejection_reasons)
+    assert any("nominal WVTR" in r for r in pla_disq.rejection_reasons)
+
+
+def test_citation_traceability_to_seeded_evidence_sources(seeded_db):
+    """Verify that every citation ID generated in recommendations exists in EvidenceSource table."""
+    from backend.app.repositories.evidence_repository import EvidenceRepository
+
+    comm = CommodityRepository.get_by_id(seeded_db, "COMM_POTATO_CHIPS")
+    materials = MaterialRepository.list_all(seeded_db)
+
+    inp = RecommendationInput(
+        commodity_id="COMM_POTATO_CHIPS",
+        desired_shelf_life_days=120,
+        storage_temp_c=25.0,
+        storage_rh_pct=65.0,
+    )
+
+    result = RecommendationEngine.evaluate(comm, materials, inp)
+    assert len(result.explanation.cited_evidence_sources) > 0
+
+    for ref_id in result.explanation.cited_evidence_sources:
+        source = EvidenceRepository.get_by_id(seeded_db, ref_id)
+        assert source is not None, f"Cited reference_id '{ref_id}' not found in EvidenceSource!"
 
 
 def test_processed_high_acid_food_tomato_paste(seeded_db):

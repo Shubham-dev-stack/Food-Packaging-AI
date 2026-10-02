@@ -52,24 +52,44 @@ def evaluate_material_candidate(
     rejections: list[str] = []
     conditions: list[str] = []
 
-    # 1. Produce Respiration Constraints
+    # 1. Produce Respiration Constraints (Coupled System Physics)
     if is_respiring:
-        # Non-perforated barrier films are fatal for respiring crops
-        if bp.otr_value < 1000.0:
-            rejections.append(
-                f"Severe hypoxia risk: film OTR ({bp.otr_value:.1f} cm3/(m2*day*atm)) is too "
-                "low for respiring produce, causing anaerobic fermentation and toxic off-odors."
-            )
+        is_dense_barrier = (
+            material.material_family
+            in [
+                "metallized_film",
+                "aluminum_foil_laminate",
+            ]
+            or bp.otr_value <= 50.0
+        )
 
-        if specs.is_microperforation_required and not (bp.is_microperforated or bp.is_breathable):
+        is_permeable_or_perforated = bp.is_microperforated or bp.is_breathable
+
+        # Dense foil/metallized films are physically incompatible with fresh produce respiration
+        if is_dense_barrier and not is_permeable_or_perforated:
             rejections.append(
-                "High produce respiration requires micro-perforations or breathable membrane "
-                "to vent CO2. This film is continuous and non-perforated."
+                "Severe hypoxia hazard: non-perforated barrier/metallized film inhibits "
+                "respiratory gas exchange, inducing rapid anaerobiosis and foul off-odors."
             )
+        elif not is_permeable_or_perforated:
+            # Check if continuous film provides < 20% of required equilibrium OTR
+            if bp.otr_value < (0.20 * specs.max_recommended_otr):
+                rejections.append(
+                    f"Severe hypoxia risk: continuous film OTR ({bp.otr_value:.1f} "
+                    f"cm3/(m2*day*atm)) provides <20% of equilibrium demand (OTR_eq = "
+                    f"{specs.max_recommended_otr:.1f} cm3/(m2*day*atm))."
+                )
+            elif specs.is_microperforation_required:
+                # Continuous film is permeable, but produce requires micro-perforations to vent CO2
+                conditions.append(
+                    "Produce breathability condition: high produce respiration requires "
+                    "laser/mechanical micro-perforations or breathable patch on this continuous "
+                    "web to vent CO2 and prevent sulfur off-odors."
+                )
 
     # 2. Dry / Processed Goods Barrier Constraints
     else:
-        # Check Water Vapor Transmission Rate (WVTR)
+        # Check Water Vapor Transmission Rate (WVTR under ASTM F1249-20)
         if bp.wvtr_value > specs.max_recommended_wvtr:
             rejections.append(
                 f"Moisture barrier insufficient: nominal WVTR ({bp.wvtr_value:.1f} g/(m2*day)) "
@@ -77,7 +97,7 @@ def evaluate_material_candidate(
                 "risking premature texture softening and moisture gain."
             )
 
-        # Check Oxygen Transmission Rate (OTR)
+        # Check Oxygen Transmission Rate (OTR under ASTM D3985-17)
         if bp.otr_value > specs.max_recommended_otr:
             rejections.append(
                 f"Oxygen barrier insufficient: nominal OTR ({bp.otr_value:.1f} cm3/(m2*day*atm)) "
@@ -85,23 +105,28 @@ def evaluate_material_candidate(
                 "accelerating oxidative rancidity and off-flavor generation."
             )
 
-        # Check Light Sensitivity Protection
+        # Check Light Sensitivity Protection (Based on photo-sensitivity, not day threshold)
         if specs.is_light_barrier_required:
             is_opaque_or_metal = material.material_family in [
                 "metallized_film",
                 "aluminum_foil_laminate",
             ]
-            if not is_opaque_or_metal and inp.desired_shelf_life_days > 60:
+            if not is_opaque_or_metal:
                 conditions.append(
-                    "Light barrier caution: transparent film requires an opaque secondary "
-                    "outer box to protect photo-sensitive lipids from light oxidation."
+                    "Light barrier consideration: commodity has documented photo-sensitivity "
+                    "(lipid auto-oxidation / pigment bleaching). Transparent film requires "
+                    "secondary opaque outer packaging (e.g. carton) or UV-blocking additives if "
+                    "exposed to display lighting."
                 )
 
-    # 3. Sub-Zero Frozen Storage Compatibility
+    # 3. Sub-Zero Frozen Storage Compatibility (Qualitative Concern, not automatic binary failure)
     if inp.storage_type == StorageType.FROZEN and material.material_family == "biodegradable_film":
-        rejections.append(
-            "Neat PLA biodegradable film suffers brittle embrittlement at sub-zero temperatures "
-            "(Tg ~ 55-60 C), leading to shatter fractures during frozen handling."
+        conditions.append(
+            "[QUALITATIVE CONCERN - LOW-TEMPERATURE HANDLING] Neat PLA and rigid bio-polyesters "
+            "exhibit high glass transition temperatures (Tg ~ 55-60 C) and may suffer brittle "
+            "fracture under impact in sub-zero frozen storage unless plasticized or modified "
+            "with co-polyesters (e.g. PBAT blend). Grade-specific low-temperature impact testing "
+            "(ASTM D1709) is recommended before frozen distribution."
         )
 
     # 4. Sealability Check
