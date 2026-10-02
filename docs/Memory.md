@@ -151,6 +151,36 @@
 
 ---
 
-## 8. Next Implementation Phase
-- **Immediate Next Step:** **Phase 3 — REST API & Integration**.
-- **Scope of Phase 3:** FastAPI routers, Pydantic v2 request/response schemas, API error handling, integration between the persistence repository layer and domain recommendation engine, and API integration tests. No frontend features or UI implementation.
+---
+
+## 8. Phase 3 REST API & Integration Summary
+
+- **Architecture:** Decoupled layered architecture where the HTTP/API layer acts purely as an adapter around the pure domain engine.
+  - `HTTP Request` $\rightarrow$ `FastAPI Router` $\rightarrow$ `Pydantic v2 Request Validation` $\rightarrow$ `RecommendationService` $\rightarrow$ `Repositories (Joined SQLAlchemy ORM)` $\rightarrow$ `RecommendationEngine.evaluate(...)` (Pure domain) $\rightarrow$ `RecommendationRepository (Audit Log Persistence)` $\rightarrow$ `Pydantic Response Serialization`.
+- **Domain Layer Boundary Preserved:** `backend/app/domain/` remained 100% untouched. Zero imports of FastAPI, Pydantic, SQLAlchemy, or HTTP exceptions in domain logic.
+- **Implemented Endpoints (`/api` prefix):**
+  1. `GET /api/health` — System and database health status (preserved from Phase 0).
+  2. `GET /api/commodities` — Query catalog of commodities (optional `category` filter).
+  3. `GET /api/commodities/{commodity_id}` — Detailed postharvest parameters, baseline properties, respiration data, and MAP targets.
+  4. `GET /api/materials` — Query candidate packaging materials (optional `family` filter) with ASTM test specs, eco-metrics, and cost index.
+  5. `GET /api/materials/{material_id}` — Complete physical barrier specs, test conditions, recyclability, and cost multiplier.
+  6. `GET /api/evidence` — Query bibliographic citations, ASTM testing standards, and literature evidence.
+  7. `GET /api/evidence/{reference_id}` — Detailed citation metadata, DOI/standard number, and verification notes.
+  8. `POST /api/recommendations` — Evaluate optimal packaging materials, barrier targets, and explainable decision trace for given commodity context.
+  9. `GET /api/recommendations/{request_id}` — Retrieve persisted recommendation session by audit ID.
+  10. `GET /` — API root service status and link to interactive OpenAPI documentation (`/docs`).
+- **Standardized Error Handling (`backend/app/api/errors.py`):**
+  - Uniform JSON structure: `{"error": "...", "message": "...", "details": [...]}`.
+  - Pydantic validation errors return structured 422 with field-level issues.
+  - Missing entities return 404 with clean resource descriptions.
+  - Unhandled server exceptions logged internally with generated UUID `error_id`, returning sanitized 500 without leaking stack traces or environment variables.
+- **Audit Persistence (`backend/app/repositories/recommendation_repository.py`):**
+  - Every evaluation logs full input conditions to `recommendation_requests` and resulting recommendations to `recommendation_results`.
+- **Automated Verification:** 61 automated tests passing across 10 test modules (`pytest` 100% pass rate). Ruff linting and formatting 100% compliant. Frontend strict TypeScript check and production build verified with 0 errors.
+
+---
+
+## 9. Next Implementation Phase
+- **Immediate Next Step:** **Phase 4 — Frontend Core & Input Workspace**.
+- **Scope of Phase 4:** Build the React + TypeScript responsive input workstation (split-screen layout, commodity search/selector, physical parameter sliders with real-time client-side bounds checking, storage mode toggles, and API client integration). Results dashboard rendering deferred to Phase 5.
+

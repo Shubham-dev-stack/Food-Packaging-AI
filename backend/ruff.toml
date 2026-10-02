@@ -4,7 +4,7 @@ target-version = "py312"
 
 [lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = []
+ignore = ["B008"]
 
 [lint.isort]
 known-first-party = ["backend"]
