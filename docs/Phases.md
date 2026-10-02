@@ -175,16 +175,19 @@ flowchart LR
 
 ---
 
-### Phase 10: Deployment Preparation
-- **Objective:** Package the application for simple, reliable deployment.
+### Phase 10: Production Readiness, Security Hardening & SIH Demo Reliability ✅
+- **Objective:** Harden configuration, security, database readiness, frontend timeouts, and automate demo verification.
 - **Prerequisites:** Phase 9 complete.
 - **Deliverables:**
-  - Multi-stage Dockerfile or simple PaaS deployment configuration (Render / Railway / Vercel).
-  - Standalone local demonstration startup script (`run_local.sh` / `run_local.ps1`).
-  - Production readiness runbook in `docs/runbooks/deploy.md`.
-- **Expected Files:** `Dockerfile`, `docker-compose.yml`, `run_local.ps1`.
-- **Verification:** Application boots cleanly in an isolated container environment.
-- **Definition of Done:** Single command starts the entire system locally or on cloud hosting.
+  - Lifespan context manager (`@asynccontextmanager lifespan`) in `backend/app/main.py` auto-initializing database schema.
+  - Health & readiness probe (`GET /api/health`) executing lightweight `SELECT 1` checking DB liveness and environment.
+  - Clean configuration via `backend/app/core/config.py`, `LOG_LEVEL`, and non-wildcard `CORS_ORIGINS`.
+  - Frontend API hardening with `DEFAULT_REQUEST_TIMEOUT_MS = 10000` (10s) and UI retry mechanism.
+  - End-to-end smoke test suite (`backend/tests/test_smoke.py`) covering all 4 core SIH demonstration scenarios.
+  - Comprehensive evaluator quickstart and local execution documentation in `README.md`.
+- **Expected Files:** `backend/app/main.py`, `backend/app/api/v1/health.py`, `backend/tests/test_smoke.py`, `frontend/src/services/api.ts`, `frontend/src/pages/Workspace.tsx`.
+- **Verification:** 85/85 backend tests passing, 31/31 frontend tests passing, zero ruff lint errors, production Vite build verified.
+- **Definition of Done:** Production-ready configuration, zero hardcoded secrets, deterministic smoke tests passing, evaluated cleanly.
 
 ---
 

@@ -8,12 +8,12 @@
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 9 Complete — Decision Validation, Edge-Case Hardening & Recommendation Reliability Verified**. Ready for **Phase 10: Deployment Preparation**.
+- **Current Phase:** **Phase 10 Complete — Production Readiness, Security Hardening & SIH Demo Reliability Verified**. Ready for **Phase 11: SIH Demo Polish & Benchmark Walkthroughs**.
 - **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All multi-criteria ranking calculations enforce 10 formal invariants, complete tie-breaking determinism, and explicit degradation uncertainty models for boundary temperatures and multi-year durations.
 - **Application Code Status:**
-  - Backend: 80 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
-  - Frontend: Production build, strict TypeScript compilation, and 31 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
-- **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
+  - Backend: 85 automated tests passing (`pytest` with 100% pass rate, including 5 E2E smoke tests). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
+  - Frontend: Production build, strict TypeScript compilation, and 31 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix, request timeout handling (10s), and UI retry error states.
+- **Repository Integrity:** Clean, reproducible environment. Database and test files isolated. Zero hardcoded credentials. CORS configured without wildcards. Auto-initialization on startup.
 
 ---
 
@@ -383,8 +383,36 @@
 
 ---
 
-## 16. Next Implementation Phase
-- **Immediate Next Step:** **Phase 10 — Deployment Preparation**.
-- **Scope of Phase 10:** Standalone Docker packaging, container build verification, environment configuration, and local startup automation.
+## 16. Phase 10 Production Readiness, Security Hardening & SIH Demo Reliability Summary
+- **Architecture & Infrastructure Hardening:**
+  - **Lifespan Context Manager:** Added `@asynccontextmanager async def lifespan(app: FastAPI)` in `backend/app/main.py` executing `init_db()` safely on startup with structured startup/shutdown logs, eliminating reliance on deprecated `@app.on_event("startup")`.
+  - **Database Readiness & Auto-Directory Creation:** Enhanced `backend/app/core/db.py` to auto-create missing parent directories for SQLite databases (e.g. `data/`), ensuring zero boot failures on fresh checkouts.
+  - **Health Probe with DB Liveness Check:** Updated `GET /api/health` in `backend/app/api/v1/health.py` to execute a lightweight `SELECT 1` query via `db.execute(text("SELECT 1"))` returning `{"status": "healthy", "service": "food-packaging-ai-backend", "version": "0.1.0", "database": "connected", "environment": "development"}`. If the database is unreachable, it cleanly reports `"database": "unavailable"`.
+  - **Environment & Configuration:**
+    - Added `LOG_LEVEL` setting in `backend/app/core/config.py` defaulting to `INFO`.
+    - Added validator for `CORS_ORIGINS` supporting JSON array string or comma-separated list without wildcard `*`.
+    - Created explicit `.env.example` in root, `backend/`, and `frontend/` with zero production secrets.
+  - **Frontend API Hardening:**
+    - Added `DEFAULT_REQUEST_TIMEOUT_MS = 10000` (10 seconds) with `AbortController` timeout logic in `frontend/src/services/api.ts`.
+    - Distinctly mapped timeout errors to `REQUEST_TIMEOUT` (HTTP 408) and network drops to `NETWORK_ERROR` (HTTP 0).
+    - Added interactive Retry button and Dismiss button in `frontend/src/pages/Workspace.tsx` error banner.
+  - **E2E Smoke Test Suite (`backend/tests/test_smoke.py`):**
+    - 5 automated smoke tests verifying health/readiness and the 4 SIH demo scenarios:
+      1. `test_smoke_health_and_readiness`: Verifies `GET /api/health` responds 200 with active DB and environment.
+      2. `test_smoke_scenario_1_potato_chips_baseline`: Verifies ambient crispy snack recommendation (high-barrier foil laminate, WVTR < 5.0, OTR < 10.0, light barrier).
+      3. `test_smoke_scenario_2_fresh_broccoli_map`: Verifies chilled fresh broccoli MAP (microperforation, respiration temperature adjustment, equilibrium OTR demand).
+      4. `test_smoke_scenario_3_uncharacterized_produce_research_required`: Verifies produce lacking verified MAP gas mixtures outputs `RESEARCH_REQUIRED` flag without fabricating gas concentrations.
+      5. `test_smoke_scenario_4_impossible_constraints_no_candidates`: Verifies catalog failure returns `RESEARCH_REQUIRED` with 0 false-positives and clean rejection reasons.
+- **Verification & Test Status:**
+  - Backend: 85 automated pytest tests passing (100% pass rate). Ruff check & format clean (0 errors across 57 files).
+  - Frontend: 31 vitest unit tests passing across 4 test suites. Strict TypeScript check (`tsc -b --noEmit`) passes with 0 errors. Vite production build passes with 0 errors (43 modules transformed, `dist/` bundle created).
+  - Documentation: `README.md` completely overhauled with evaluator quickstart, local running guide, test commands, and regulatory notice.
+
+---
+
+## 17. Next Implementation Phase
+- **Immediate Next Step:** **Phase 11 — SIH Demo Polish & Benchmark Walkthroughs**.
+- **Scope of Phase 11:** 1-click benchmark preset buttons, packaging QR code generator, and 3-min/5-min evaluator walkthrough scripts.
+
 
 

@@ -26,24 +26,53 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+export const DEFAULT_REQUEST_TIMEOUT_MS = 10000;
+
+async function request<T>(
+  endpoint: string,
+  options?: RequestInit & { timeoutMs?: number },
+): Promise<T> {
   const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
   const defaultHeaders: Record<string, string> = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
   };
 
   if (options?.body) {
     defaultHeaders['Content-Type'] = 'application/json';
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options?.headers,
-    },
-  });
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      signal: options?.signal || controller.signal,
+      headers: {
+        ...defaultHeaders,
+        ...options?.headers,
+      },
+    });
+  } catch (err: unknown) {
+    clearTimeout(timeoutId);
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new ApiError(408, {
+        error: 'REQUEST_TIMEOUT',
+        message: `Request timed out after ${timeoutMs}ms. Please check your backend connection and try again.`,
+        details: [],
+      });
+    }
+    throw new ApiError(0, {
+      error: 'NETWORK_ERROR',
+      message: err instanceof Error ? err.message : 'Network error connecting to backend service.',
+      details: [],
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     let errorData: ApiErrorResponse;

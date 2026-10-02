@@ -358,7 +358,32 @@ export const Workspace: React.FC = () => {
         {generalError && (
           <div className="mb-6">
             <Alert type="error" title="Engine Evaluation Alert">
-              {generalError}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span>{generalError}</span>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGeneralError(null);
+                      if (commodities.length === 0) {
+                        fetchCommodities();
+                      } else if (lastSubmittedPayload) {
+                        handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+                      }
+                    }}
+                    className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+                  >
+                    Retry
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGeneralError(null)}
+                    className="px-3 py-1 bg-white hover:bg-rose-50 text-rose-700 border border-rose-300 text-xs font-medium rounded-md transition cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
             </Alert>
           </div>
         )}

@@ -1,11 +1,36 @@
 """FastAPI application entrypoint, middleware, exception handlers, and routing."""
 
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.errors import register_exception_handlers
 from backend.app.api.v1.router import api_router
 from backend.app.core.config import settings
+from backend.app.core.db import init_db
+
+logging.basicConfig(
+    level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("food_packaging_ai")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Execute startup and shutdown tasks safely."""
+    logger.info("Initializing database schema on startup...")
+    try:
+        init_db()
+        logger.info("Database schema initialized successfully.")
+    except Exception as e:
+        logger.error("Failed to initialize database schema: %s", e)
+    yield
+    logger.info("Shutting down application...")
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -14,6 +39,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
 # Register uniform error handling across the application

@@ -26,7 +26,18 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 # Create engine based on environment configuration
 # check_same_thread=False is required for SQLite when handling multiple threads in FastAPI/Pytest
-connect_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
+if settings.DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+    # Ensure parent directory exists if database file is located in a subfolder
+    sqlite_file = settings.DATABASE_URL.replace("sqlite:///", "")
+    if sqlite_file and sqlite_file != ":memory:":
+        from pathlib import Path
+
+        db_path = Path(sqlite_file)
+        if db_path.parent and not db_path.parent.exists():
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+else:
+    connect_args = {}
 
 engine = create_engine(
     settings.DATABASE_URL,

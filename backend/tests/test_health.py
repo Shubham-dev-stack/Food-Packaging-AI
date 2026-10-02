@@ -12,6 +12,8 @@ def test_health_check():
     data = response.json()
     assert data["status"] == "healthy"
     assert data["service"] == "food-packaging-ai-backend"
+    assert data["database"] == "connected"
+    assert "environment" in data
     assert "version" in data
 
 
