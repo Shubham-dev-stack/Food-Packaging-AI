@@ -8,9 +8,11 @@
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 2 Complete — Domain Physics & Recommendation Engine Verified**. Ready for **Phase 3: REST API & Integration**.
+- **Current Phase:** **Phase 4 Complete — Frontend Core & Input Workspace Verified**. Ready for **Phase 5: Recommendation Dashboard & Results Display**.
 - **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All calculations based on published food science principles and verified peer-reviewed formulas.
-- **Application Code Status:** 36 automated tests passing in backend (`pytest` with 100% pass rate: 8 data model, 10 physics unit, 2 health, 9 engine integration scenarios, 7 seeding idempotency/repository tests). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`). Frontend build and strict TypeScript check verified with 0 errors.
+- **Application Code Status:**
+  - Backend: 61 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
+  - Frontend: Production build and strict TypeScript check verified with 0 errors (`tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
 - **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
 
 ---
@@ -180,7 +182,43 @@
 
 ---
 
-## 9. Next Implementation Phase
+## 9. Next Implementation Phase (Historical)
 - **Immediate Next Step:** **Phase 4 — Frontend Core & Input Workspace**.
 - **Scope of Phase 4:** Build the React + TypeScript responsive input workstation (split-screen layout, commodity search/selector, physical parameter sliders with real-time client-side bounds checking, storage mode toggles, and API client integration). Results dashboard rendering deferred to Phase 5.
+
+---
+
+## 10. Phase 4 Frontend Core & Input Workspace Summary
+
+- **Architecture:** Professional responsive split-screen input workstation built with React 19, TypeScript, Vite, and Tailwind CSS v4.
+  - Zero heavy external state management libraries (Redux/Zustand); uses clean React state/hooks and modular components.
+  - Full adherence to canonical API route prefix: strictly `/api` via Vite development proxy (`/api` $\rightarrow$ `http://127.0.0.1:8000`).
+- **Core Components Created & Integrated (`frontend/src/`):**
+  1. `types/api.ts`: Canonical TypeScript type definitions strictly matching backend Pydantic models (`RecommendationCreateRequest`, `RecommendationResponse`, `CandidateEvaluationResponse`, `CommodityDetailResponse`, `CommodityBriefResponse`, etc.).
+  2. `services/api.ts`: Strongly-typed API client wrapper handling `GET /api/commodities`, `GET /api/commodities/{id}`, `POST /api/recommendations`, `GET /api/recommendations/{id}`, and `GET /api/health`, converting backend error responses to typed `ApiError` instances.
+  3. `components/common/FormField.tsx`: Reusable accessible form field wrapper supporting label, sublabel, required badge, user override indicator, reset action, and inline validation errors.
+  4. `components/common/Alert.tsx`: Reusable alert banner with semantic styling (`info`, `warning`, `error`, `success`).
+  5. `components/inputs/CommodityPicker.tsx`: Commodity selection dropdown with loading, empty catalog, and error/retry states.
+  6. `components/inputs/BaselinePreviewCard.tsx`: Real-time inspection panel displaying the selected commodity's baseline physicochemical parameters ($a_w$, typical moisture %, fat %, pH), respiration kinetics ($Q_{10}$, reference rate), and literature citation provenance.
+  7. `components/inputs/EnvironmentalInputs.tsx`: Distribution & storage condition controls including storage regime segmented selector (`ambient`, `chilled`, `frozen`), target shelf life days (1 to 730), temperature slider (-25°C to 50°C), RH slider (10% to 100%), and transit stress profile selector (`local_standard`, `long_haul_refrigerated`, `rough_terrain_unpaved`).
+  8. `components/inputs/PropertyOverrides.tsx`: Collapsible accordion for optional user overrides (moisture %, $a_w$, fat %, pH, respiration rate) with individual "Reset to Baseline" controls, packaging prototype geometry inputs (net weight kg, permeation area m²), and the bio-based/circular substrate preference toggle.
+  9. `pages/Workspace.tsx`: Top-level input workstation coordinating state, client-side validation, backend request submission, submission spinner, error reporting, and Phase 4/Phase 5 handoff feedback panel.
+  10. `App.tsx`: Mounted `Workspace` component as root application view.
+- **Client-Side Validation & Guardrails:**
+  - Enforces shelf life bounds (1–730 days), temperature bounds (-25°C to 50°C), RH bounds (10%–100%), geometry bounds ($>0$).
+  - Enforces storage regime physical coherence: frozen $\le 0.0^\circ\text{C}$, chilled $-2.0^\circ\text{C}$ to $15.0^\circ\text{C}$, ambient $\ge 5.0^\circ\text{C}$.
+  - Respiration override disabled for non-respiring crops.
+- **Scope Discipline Maintained:**
+  - Zero modification to backend domain engine in `backend/app/domain/`.
+  - Final results dashboard, candidate comparison radar/bar charts, detailed packaging specs grid, MAP gas dynamics visualizations, and QR code generation are strictly deferred to Phase 5.
+- **Verification Status:**
+  - `tsc -b && vite build` succeeds with 0 errors.
+  - Backend 61 pytest tests passing with 100% rate.
+  - Backend lint and format 100% compliant (`ruff check`, `ruff format --check`).
+
+---
+
+## 11. Next Implementation Phase
+- **Immediate Next Step:** **Phase 5 — Recommendation Dashboard & Results Display**.
+- **Scope of Phase 5:** Build candidate comparison cards, MCDA score breakdowns, target barrier vs material barrier visualization, MAP gas composition charts, disqualification explanation audit, and literature evidence provenance modal.
 
