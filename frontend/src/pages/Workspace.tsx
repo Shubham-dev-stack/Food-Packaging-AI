@@ -9,6 +9,7 @@ import { api, ApiError } from '../services/api';
 import type {
   CommodityDetailResponse,
   CommodityBriefResponse,
+  OptimizationPreference,
   StorageType,
   TransitStress,
   RecommendationResponse,
@@ -27,6 +28,10 @@ export const Workspace: React.FC = () => {
   const [commodityDetail, setCommodityDetail] = useState<CommodityDetailResponse | null>(null);
   const [loadingCommodities, setLoadingCommodities] = useState<boolean>(true);
   const [loadingDetail, setLoadingDetail] = useState<boolean>(false);
+
+  // Multi-criteria optimization preference state [PROTOTYPE ASSUMPTION]
+  const [optimizationPreference, setOptimizationPreference] = useState<OptimizationPreference>('balanced');
+  const [submittingPreference, setSubmittingPreference] = useState<boolean>(false);
 
   // Environmental inputs state
   const [shelfLifeDays, setShelfLifeDays] = useState<number>(180);
@@ -221,7 +226,8 @@ export const Workspace: React.FC = () => {
       storage_rh_pct: storageRhPct,
       storage_type: storageType,
       transit_stress: transitStress,
-      user_sustainability_preference: sustainabilityPreference,
+      user_sustainability_preference: sustainabilityPreference || optimizationPreference === 'sustainability',
+      optimization_preference: optimizationPreference,
       package_weight_kg: packageWeightKg,
       package_area_m2: packageAreaM2,
     };
@@ -258,11 +264,34 @@ export const Workspace: React.FC = () => {
     }
   };
 
+  const handlePreferenceChange = async (newPref: OptimizationPreference) => {
+    if (!lastSubmittedPayload) return;
+    const updatedPayload: RecommendationCreateRequest = {
+      ...lastSubmittedPayload,
+      optimization_preference: newPref,
+      user_sustainability_preference: newPref === 'sustainability',
+    };
+    try {
+      setSubmittingPreference(true);
+      const updatedResult = await api.createRecommendation(updatedPayload);
+      setRecommendationResult(updatedResult);
+      setLastSubmittedPayload(updatedPayload);
+      setOptimizationPreference(newPref);
+      setSustainabilityPreference(newPref === 'sustainability');
+    } catch (err) {
+      setGeneralError(err instanceof Error ? err.message : 'Failed to update optimization preference');
+    } finally {
+      setSubmittingPreference(false);
+    }
+  };
+
   const handleResetForNewEvaluation = () => {
     setRecommendationResult(null);
     setCurrentStep('input');
     setGeneralError(null);
     setErrors({});
+    setOptimizationPreference('balanced');
+    setSubmittingPreference(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -342,6 +371,8 @@ export const Workspace: React.FC = () => {
             commodityDetail={commodityDetail}
             onModifyInputs={() => setCurrentStep('input')}
             onNewEvaluation={handleResetForNewEvaluation}
+            onPreferenceChange={handlePreferenceChange}
+            isPreferenceLoading={submittingPreference}
           />
         ) : (
           /* WORKFLOW VIEW 1: INPUT WORKSPACE */

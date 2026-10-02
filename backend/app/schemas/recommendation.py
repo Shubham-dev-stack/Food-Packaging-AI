@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, model_validator
 
 from backend.app.domain.types import (
     CandidateEligibility,
+    OptimizationPreference,
     RecommendationStatus,
     StorageType,
     TransitStress,
@@ -28,6 +29,16 @@ class RankingWeightsRequest(BaseModel):
         if not (0.999 <= total <= 1.001):
             raise ValueError(f"Ranking weights must sum to 1.0 (got {total:.4f})")
         return self
+
+
+class RankingWeightsResponse(BaseModel):
+    """Weighting factors applied during multi-attribute utility ranking [PROTOTYPE ASSUMPTION]."""
+
+    w_barrier: float = Field(..., description="Weight allocated to barrier margin (0.0 to 1.0)")
+    w_sustainability: float = Field(
+        ..., description="Weight allocated to circularity/sustainability (0.0 to 1.0)"
+    )
+    w_cost: float = Field(..., description="Weight allocated to economic cost index (0.0 to 1.0)")
 
 
 class RecommendationCreateRequest(BaseModel):
@@ -63,6 +74,10 @@ class RecommendationCreateRequest(BaseModel):
     user_sustainability_preference: bool = Field(
         default=False,
         description="Whether to prioritize circularity/compostability over cost",
+    )
+    optimization_preference: OptimizationPreference = Field(
+        default=OptimizationPreference.BALANCED,
+        description="Preference preset ('balanced', 'sustainability', 'cost')",
     )
 
     # Optional property overrides
@@ -170,6 +185,10 @@ class TargetSpecificationsResponse(BaseModel):
     )
     target_otr_rationale: str = Field(..., description="Evidence context for oxygen barrier cutoff")
     thickness_rationale: str = Field(..., description="Mechanical transit stress justification")
+    adjusted_respiration_rate_co2: float | None = Field(
+        default=None,
+        description="Respiration rate at storage temperature in mg CO2/(kg*h)",
+    )
 
 
 class CandidateEvaluationResponse(BaseModel):
@@ -189,6 +208,12 @@ class CandidateEvaluationResponse(BaseModel):
     sustainability_score: float = 0.0
     cost_score: float = 0.0
     composite_utility_score: float = 0.0
+
+    # Score breakdown contributions [PROTOTYPE WEIGHTS]
+    barrier_contribution: float = 0.0
+    sustainability_contribution: float = 0.0
+    cost_contribution: float = 0.0
+    rank: int = 0
 
     # Snapshot of physical attributes
     nominal_thickness_um: float = 0.0
@@ -228,4 +253,11 @@ class RecommendationResponse(BaseModel):
     explanation: ExplanationResponse | None = None
     safety_advisory: str | None = None
     uncertainty_notes: list[str] = Field(default_factory=list)
+    applied_weights: RankingWeightsResponse | None = Field(
+        default=None, description="Prototype weighting factors applied during candidate ranking"
+    )
+    optimization_preference: OptimizationPreference = Field(
+        default=OptimizationPreference.BALANCED,
+        description="Active multi-criteria optimization preference preset",
+    )
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

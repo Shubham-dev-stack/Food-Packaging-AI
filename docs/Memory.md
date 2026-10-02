@@ -8,11 +8,11 @@
 ---
 
 ## 1. Current Project Status
-- **Current Phase:** **Phase 7 Complete — Fresh Produce Respiration & MAP Optimization Verified**. Ready for **Phase 8: Trade-off & Multi-Criteria Optimization**.
-- **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All calculations based on published food science principles and verified peer-reviewed formulas.
+- **Current Phase:** **Phase 8 Complete — Trade-Off & Multi-Criteria Optimization Verified**. Ready for **Phase 9: End-to-End Testing & Security Hardening**.
+- **Engine Logic Status:** Pure deterministic domain layer implemented in `backend/app/domain/` with zero HTTP or UI dependencies. All multi-criteria ranking calculations use transparent linear composite utility functions with explicit barrier, circularity, and cost weighting presets.
 - **Application Code Status:**
-  - Backend: 61 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
-  - Frontend: Production build, strict TypeScript compilation, and 18 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
+  - Backend: 69 automated tests passing (`pytest` with 100% pass rate). Zero lint errors (`ruff check`) and formatting verified (`ruff format --check`).
+  - Frontend: Production build, strict TypeScript compilation, and 25 unit tests passing (`vitest run`, `tsc -b && vite build`). Clean React 19 + TypeScript architecture using canonical `/api` prefix.
 - **Repository Integrity:** Clean, reproducible environment. Database and test files isolated.
 
 ---
@@ -322,8 +322,40 @@
 
 ---
 
-## 14. Next Implementation Phase
-- **Immediate Next Step:** **Phase 8 — Trade-Off & Multi-Criteria Optimization**.
-- **Scope of Phase 8:** Interactive multi-criteria sensitivity exploration, slider-driven weighting adjustments (Barrier vs. Circularity vs. Cost), Pareto boundary visualization, and dynamic alternative re-ranking.
+## 14. Phase 8 Trade-Off & Multi-Criteria Optimization Summary
+
+- **Architecture:** Implemented transparent multi-criteria decision analysis (MCDA) across backend domain and frontend UI:
+  - Preset Configurations:
+    - `balanced`: 50% Barrier ($w_b = 0.50$), 30% Sustainability ($w_s = 0.30$), 20% Cost ($w_c = 0.20$).
+    - `sustainability`: 40% Barrier ($w_b = 0.40$), 45% Sustainability ($w_s = 0.45$), 15% Cost ($w_c = 0.15$).
+    - `cost`: 40% Barrier ($w_b = 0.40$), 15% Sustainability ($w_s = 0.15$), 45% Cost ($w_c = 0.45$).
+  - Strict Hard Physical Constraints vs Soft Preference Boundaries:
+    - Hard physical packaging constraints (WVTR target compliance, OTR target compliance, micro-perforation suitability, thermal/storage limits) gate candidate qualification first in `filter_candidates()`.
+    - Soft preferences (`optimization_preference`) ONLY rank qualified candidates. Disqualified candidates cannot be rescued by weighting adjustments.
+  - Transparent Composite Utility Breakdown:
+    - $U = w_b \cdot S_b + w_s \cdot S_s + w_c \cdot S_c$
+    - Reports exact factor contributions: `barrier_contribution`, `sustainability_contribution`, `cost_contribution`, final rank `#1, #2, ...`, and applied weights object.
+  - Produce Respiration Rate Authority Audit:
+    - In `RespirationKineticsCard.tsx`, accepts authoritative Q10 adjusted rate from domain engine (`target_specifications.adjusted_respiration_rate_co2`) rather than acting as a second scientific calculation source.
+- **Frontend Implementation (`frontend/src/components/recommendation/trade-off/`):**
+  - `TradeOffAnalysisCard.tsx`:
+    - 3-way preset selector tabs (`Balanced`, `Sustainability Priority`, `Cost Priority`) with active preference badge.
+    - Visual weight distribution stacked bar with percentage indicators.
+    - Qualified Candidates Score Breakdown table displaying raw score, weighted contribution breakdown ($w \cdot S$), composite utility, and rank.
+    - Hard vs Soft constraint distinction callout informing users why disqualified candidates cannot be promoted.
+    - Plain-language trade-off summary explaining why the primary candidate scored highest and what trade-offs were made.
+  - `RecommendationResultView.tsx` & `Workspace.tsx`:
+    - Interactive `onPreferenceChange` callback enabling live re-evaluation with stateful persistence.
+- **Verification & Test Status:**
+  - Backend: 8 dedicated tests in `backend/tests/test_trade_off_optimization.py` verifying default weights, sustainability priority, cost priority, hard constraint immunity, score breakdown summation, ranking determinism, produce constraints, and schema validation.
+  - 69/69 pytest tests passing (100% pass rate). Ruff check & format clean.
+  - Frontend: 7 dedicated tests in `frontend/src/tests/TradeOffOptimization.test.tsx` (25 total frontend tests passing across 3 test files).
+  - Strict TypeScript check (`tsc -b --noEmit`) passes with 0 errors. Vite production build passes with 0 errors (43 modules).
+
+---
+
+## 15. Next Implementation Phase
+- **Immediate Next Step:** **Phase 9 — Security & Reliability Hardening / End-to-End Testing**.
+- **Scope of Phase 9:** Dependency vulnerability scan, strict CORS and security headers, input sanitization, global error boundaries, and end-to-end integration workflows.
 
 

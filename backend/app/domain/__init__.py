@@ -2,10 +2,13 @@
 
 from backend.app.domain.engine import RecommendationEngine
 from backend.app.domain.types import (
+    BALANCED_WEIGHTS,
+    COST_PRIORITY_WEIGHTS,
     SUSTAINABILITY_PRIORITY_WEIGHTS,
     CandidateEligibility,
     CandidateEvaluation,
     ExplanationData,
+    OptimizationPreference,
     RankingWeightsConfig,
     RecommendationInput,
     RecommendationResultDomain,
@@ -29,5 +32,8 @@ __all__ = [
     "TransitStress",
     "RankingWeightsConfig",
     "TransitGaugeConfig",
+    "OptimizationPreference",
+    "BALANCED_WEIGHTS",
     "SUSTAINABILITY_PRIORITY_WEIGHTS",
+    "COST_PRIORITY_WEIGHTS",
 ]

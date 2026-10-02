@@ -120,13 +120,42 @@ $$\text{Thickness}_{\text{recommended}} = \max\left(l_{\text{barrier}}, l_{\text
   - *Long-Haul Refrigerated:* $40 - 50\ \mu\text{m}$.
   - *Rough Terrain / Unpaved:* $60 - 75\ \mu\text{m}$ (or reinforced laminate web).
 
-### 3.5 Multi-Attribute Candidate Ranking (Decision-Support Preference)
-Surviving candidate materials $m \in M_{viable}$ are ranked using a multi-attribute utility function:
+### 3.5 Multi-Attribute Candidate Ranking & Trade-Off Analysis (Decision-Support Preference)
+Surviving candidate materials $m \in M_{\text{viable}}$ that satisfy all physical barrier and safety constraints are ranked using a multi-attribute utility function:
 $$U(m) = w_b \cdot S_{\text{barrier}}(m) + w_s \cdot S_{\text{sustainability}}(m) + w_c \cdot S_{\text{cost}}(m)$$
-- **Default Weights:** $w_b = 0.50$, $w_s = 0.30$, $w_c = 0.20$ `[PROTOTYPE ASSUMPTION]`.
-- **Barrier Safety Score ($S_{\text{barrier}}$):** Evaluates how comfortably the material's nominal transmission rates sit within the supported requirement ranges without excessive over-packaging.
-- **Sustainability Score ($S_{\text{sustainability}}$):** Mono-material mechanically recyclable ($1.0$), certified industrially compostable ($0.8$), specialized recycling stream ($0.5$), unrecyclable multi-material laminate ($0.2$).
-- **Cost Score ($S_{\text{cost}}$):** Inverse of relative cost multiplier ($1.0 / \text{relative\_cost\_index}$).
+
+#### Documented Decision-Support Preference Presets `[PROTOTYPE ASSUMPTION]`:
+1. **Balanced Preset (Default):**
+   - $w_b = 0.50$ (50% Barrier Margin)
+   - $w_s = 0.30$ (30% Circularity & Sustainability)
+   - $w_c = 0.20$ (20% Economic Cost Index)
+2. **Sustainability-Focused Preset:**
+   - $w_b = 0.40$ (40% Barrier Margin)
+   - $w_s = 0.45$ (45% Circularity & Sustainability)
+   - $w_c = 0.15$ (15% Economic Cost Index)
+3. **Cost-Sensitive Preset:**
+   - $w_b = 0.40$ (40% Barrier Margin)
+   - $w_s = 0.15$ (15% Circularity & Sustainability)
+   - $w_c = 0.45$ (45% Economic Cost Index)
+
+> [!IMPORTANT]
+> **PROTOTYPE ASSUMPTION NOTICE:** Weight presets provide decision-support trade-off sensitivity modeling, not scientifically optimal constants or certified procurement advice.
+
+#### Hard Constraints vs. Soft Preferences:
+- **Hard Constraints (Filtering Gate):** Determine candidate *qualification*. Materials must strictly satisfy moisture barrier (ASTM F1249), oxygen barrier (ASTM D3985), mechanical transport stress, and respiring produce breathability / micro-perforation criteria.
+- **Soft Preferences (Ranking Utility):** Determine relative *order* among qualified materials. A candidate failing hard barrier constraints is strictly rejected and **cannot become acceptable** regardless of circularity or low cost.
+
+#### Component Metric Scoring:
+- **Barrier Safety Score ($S_{\text{barrier}}$):** Base score 0.85 for meeting threshold, +0.08 if nominal WVTR $\le 50\%$ target, +0.07 if nominal OTR $\le 50\%$ target; -0.20 penalty if conditionally eligible.
+- **Sustainability Score ($S_{\text{sustainability}}$):** Mono-material mechanical recycling ($1.0$), certified compostable bio-film ($0.85$), coextrusion/monolayer ($0.65$), metallized film ($0.50$), unrecyclable multi-material laminate ($0.20$).
+- **Cost Score ($S_{\text{cost}}$):** Inverse relative cost index ($1.0 / \text{relative\_cost\_multiplier}$, where LDPE = 1.0).
+
+#### Transparent Score Breakdown:
+For each ranked candidate, the engine exposes factor score contributions:
+$$\text{Contribution}_{\text{barrier}} = w_b \cdot S_{\text{barrier}}$$
+$$\text{Contribution}_{\text{sust}} = w_s \cdot S_{\text{sust}}$$
+$$\text{Contribution}_{\text{cost}} = w_c \cdot S_{\text{cost}}$$
+$$U(m) = \text{Contribution}_{\text{barrier}} + \text{Contribution}_{\text{sust}} + \text{Contribution}_{\text{cost}}$$
 
 ---
 

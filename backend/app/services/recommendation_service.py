@@ -21,6 +21,7 @@ from backend.app.repositories.recommendation_repository import RecommendationRep
 from backend.app.schemas.recommendation import (
     CandidateEvaluationResponse,
     ExplanationResponse,
+    RankingWeightsResponse,
     RecommendationCreateRequest,
     RecommendationResponse,
     TargetSpecificationsResponse,
@@ -55,6 +56,7 @@ class RecommendationService:
             storage_type=request_data.storage_type,
             transit_stress=request_data.transit_stress,
             user_sustainability_preference=request_data.user_sustainability_preference,
+            optimization_preference=request_data.optimization_preference,
             moisture_pct=request_data.moisture_pct,
             water_activity_aw=request_data.water_activity_aw,
             oil_fat_content_pct=request_data.oil_fat_content_pct,
@@ -165,6 +167,10 @@ class RecommendationService:
                 sustainability_score=primary.sustainability_score,
                 cost_score=primary.cost_score,
                 composite_utility_score=primary.composite_utility_score,
+                barrier_contribution=primary.barrier_contribution,
+                sustainability_contribution=primary.sustainability_contribution,
+                cost_contribution=primary.cost_contribution,
+                rank=primary.rank,
                 nominal_thickness_um=primary.nominal_thickness_um,
                 nominal_otr=primary.nominal_otr,
                 nominal_wvtr=primary.nominal_wvtr,
@@ -191,6 +197,10 @@ class RecommendationService:
                 sustainability_score=alt.sustainability_score,
                 cost_score=alt.cost_score,
                 composite_utility_score=alt.composite_utility_score,
+                barrier_contribution=alt.barrier_contribution,
+                sustainability_contribution=alt.sustainability_contribution,
+                cost_contribution=alt.cost_contribution,
+                rank=alt.rank,
                 nominal_thickness_um=alt.nominal_thickness_um,
                 nominal_otr=alt.nominal_otr,
                 nominal_wvtr=alt.nominal_wvtr,
@@ -217,6 +227,10 @@ class RecommendationService:
                 sustainability_score=c.sustainability_score,
                 cost_score=c.cost_score,
                 composite_utility_score=c.composite_utility_score,
+                barrier_contribution=c.barrier_contribution,
+                sustainability_contribution=c.sustainability_contribution,
+                cost_contribution=c.cost_contribution,
+                rank=c.rank,
                 nominal_thickness_um=c.nominal_thickness_um,
                 nominal_otr=c.nominal_otr,
                 nominal_wvtr=c.nominal_wvtr,
@@ -242,6 +256,10 @@ class RecommendationService:
                 sustainability_score=c.sustainability_score,
                 cost_score=c.cost_score,
                 composite_utility_score=c.composite_utility_score,
+                barrier_contribution=c.barrier_contribution,
+                sustainability_contribution=c.sustainability_contribution,
+                cost_contribution=c.cost_contribution,
+                rank=c.rank,
                 nominal_thickness_um=c.nominal_thickness_um,
                 nominal_otr=c.nominal_otr,
                 nominal_wvtr=c.nominal_wvtr,
@@ -264,6 +282,7 @@ class RecommendationService:
                 target_wvtr_rationale=specs.target_wvtr_rationale,
                 target_otr_rationale=specs.target_otr_rationale,
                 thickness_rationale=specs.thickness_rationale,
+                adjusted_respiration_rate_co2=specs.adjusted_respiration_rate_co2,
             )
             if specs
             else None
@@ -284,6 +303,16 @@ class RecommendationService:
             else None
         )
 
+        applied_weights_resp = (
+            RankingWeightsResponse(
+                w_barrier=domain_result.applied_weights.w_barrier,
+                w_sustainability=domain_result.applied_weights.w_sustainability,
+                w_cost=domain_result.applied_weights.w_cost,
+            )
+            if domain_result.applied_weights
+            else None
+        )
+
         return RecommendationResponse(
             request_id=request_id,
             status=domain_result.status,
@@ -297,6 +326,8 @@ class RecommendationService:
             explanation=expl_resp,
             safety_advisory=domain_result.safety_advisory,
             uncertainty_notes=domain_result.uncertainty_notes,
+            applied_weights=applied_weights_resp,
+            optimization_preference=domain_result.optimization_preference,
             created_at=created_at,
         )
 

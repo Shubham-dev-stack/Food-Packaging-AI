@@ -39,6 +39,14 @@ class TransitStress(StrEnum):
     ROUGH_TERRAIN_UNPAVED = "rough_terrain_unpaved"
 
 
+class OptimizationPreference(StrEnum):
+    """User-selectable multi-criteria ranking preference presets [PROTOTYPE ASSUMPTION]."""
+
+    BALANCED = "balanced"
+    SUSTAINABILITY = "sustainability"
+    COST = "cost"
+
+
 @dataclass(frozen=True)
 class RecommendationInput:
     """Validated domain input payload representing commodity and storage context."""
@@ -50,6 +58,7 @@ class RecommendationInput:
     storage_type: StorageType = StorageType.AMBIENT
     transit_stress: TransitStress = TransitStress.LOCAL_STANDARD
     user_sustainability_preference: bool = False
+    optimization_preference: OptimizationPreference = OptimizationPreference.BALANCED
 
     # Optional commodity property overrides (if None, reference baseline is used)
     moisture_pct: float | None = None
@@ -97,11 +106,23 @@ class RankingWeightsConfig:
             raise ValueError(f"Ranking weights must sum to 1.0, got {total:.4f}")
 
 
-# Indicative user preference scenario (prototype weighting, not scientifically optimal)
+# Documented decision-support preference presets [PROTOTYPE ASSUMPTION]
+BALANCED_WEIGHTS = RankingWeightsConfig(
+    w_barrier=0.50,
+    w_sustainability=0.30,
+    w_cost=0.20,
+)
+
 SUSTAINABILITY_PRIORITY_WEIGHTS = RankingWeightsConfig(
     w_barrier=0.40,
     w_sustainability=0.45,
     w_cost=0.15,
+)
+
+COST_PRIORITY_WEIGHTS = RankingWeightsConfig(
+    w_barrier=0.40,
+    w_sustainability=0.15,
+    w_cost=0.45,
 )
 
 
@@ -118,6 +139,7 @@ class TargetSpecifications:
     target_wvtr_rationale: str
     target_otr_rationale: str
     thickness_rationale: str
+    adjusted_respiration_rate_co2: float | None = None  # Authoritative domain Q10 adjusted rate
 
 
 @dataclass
@@ -133,11 +155,17 @@ class CandidateEvaluation:
     rejection_reasons: list[str] = field(default_factory=list)
     condition_notes: list[str] = field(default_factory=list)
 
-    # Scored metrics
+    # Scored metrics (0.0 to 1.0)
     barrier_safety_score: float = 0.0
     sustainability_score: float = 0.0
     cost_score: float = 0.0
     composite_utility_score: float = 0.0
+
+    # Score breakdown contributions [PROTOTYPE WEIGHTS]
+    barrier_contribution: float = 0.0
+    sustainability_contribution: float = 0.0
+    cost_contribution: float = 0.0
+    rank: int = 0
 
     # Material attributes snapshot
     nominal_thickness_um: float = 0.0
@@ -178,3 +206,5 @@ class RecommendationResultDomain:
     explanation: ExplanationData | None = None
     safety_advisory: str | None = None
     uncertainty_notes: list[str] = field(default_factory=list)
+    applied_weights: RankingWeightsConfig = field(default_factory=RankingWeightsConfig)
+    optimization_preference: OptimizationPreference = OptimizationPreference.BALANCED

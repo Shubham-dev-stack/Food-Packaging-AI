@@ -1,9 +1,12 @@
 """Multi-Criteria Decision Analysis (MCDA) utility ranking for viable candidate materials."""
 
 from backend.app.domain.types import (
+    BALANCED_WEIGHTS,
+    COST_PRIORITY_WEIGHTS,
     SUSTAINABILITY_PRIORITY_WEIGHTS,
     CandidateEligibility,
     CandidateEvaluation,
+    OptimizationPreference,
     RankingWeightsConfig,
     TargetSpecifications,
 )
@@ -62,40 +65,52 @@ def rank_candidates(
     specs: TargetSpecifications,
     prioritize_sustainability: bool = False,
     weights_config: RankingWeightsConfig | None = None,
-) -> tuple[list[CandidateEvaluation], CandidateEvaluation | None, CandidateEvaluation | None]:
+    preference: OptimizationPreference = OptimizationPreference.BALANCED,
+) -> tuple[
+    list[CandidateEvaluation],
+    CandidateEvaluation | None,
+    CandidateEvaluation | None,
+    RankingWeightsConfig,
+]:
     """Score and rank viable candidate materials using multi-attribute utility.
 
-    Decision-support prototype baseline weights: 50% barrier, 30% sustainability, 20% cost.
-    (Matches docs/AI_Recommendation_Engine.md Section 3.5 [PROTOTYPE ASSUMPTION]).
+    Documented decision-support prototype weighting presets [PROTOTYPE ASSUMPTION]:
+    - Balanced: 50% barrier, 30% sustainability, 20% cost.
+    - Sustainability-focused: 40% barrier, 45% sustainability, 15% cost.
+    - Cost-sensitive: 40% barrier, 15% sustainability, 45% cost.
 
     Returns:
-        (ranked_candidates, primary_candidate, eco_alternative_candidate)
+        (ranked_candidates, primary_candidate, alternative_candidate, applied_weights)
     """
-    if not candidates:
-        return [], None, None
-
-    # Configurable weights [PROTOTYPE ASSUMPTION]
+    # Resolve weighting configuration [PROTOTYPE ASSUMPTION]
     if weights_config is not None:
         cfg = weights_config
-    elif prioritize_sustainability:
+    elif preference == OptimizationPreference.SUSTAINABILITY or prioritize_sustainability:
         cfg = SUSTAINABILITY_PRIORITY_WEIGHTS
+    elif preference == OptimizationPreference.COST:
+        cfg = COST_PRIORITY_WEIGHTS
     else:
-        cfg = RankingWeightsConfig()
+        cfg = BALANCED_WEIGHTS
+
+    if not candidates:
+        return [], None, None, cfg
 
     w_barrier = cfg.w_barrier
     w_sust = cfg.w_sustainability
     w_cost = cfg.w_cost
 
-    # Score each candidate
+    # Score each candidate and record factor contributions
     for cand in candidates:
         cand.barrier_safety_score = score_barrier_margin(cand, specs)
         cand.sustainability_score = score_sustainability(cand)
         cand.cost_score = score_relative_cost(cand)
 
+        cand.barrier_contribution = round(w_barrier * cand.barrier_safety_score, 4)
+        cand.sustainability_contribution = round(w_sust * cand.sustainability_score, 4)
+        cand.cost_contribution = round(w_cost * cand.cost_score, 4)
+
         utility = (
-            (w_barrier * cand.barrier_safety_score)
-            + (w_sust * cand.sustainability_score)
-            + (w_cost * cand.cost_score)
+            cand.barrier_contribution + cand.sustainability_contribution + cand.cost_contribution
         )
         cand.composite_utility_score = round(utility, 4)
 
@@ -111,6 +126,9 @@ def rank_candidates(
         ),
         reverse=True,
     )
+
+    for idx, cand in enumerate(ranked):
+        cand.rank = idx + 1
 
     primary = ranked[0]
 
@@ -128,4 +146,4 @@ def rank_candidates(
                 eco_alt = alt
                 break
 
-    return ranked, primary, eco_alt
+    return ranked, primary, eco_alt, cfg

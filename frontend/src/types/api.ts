@@ -22,6 +22,14 @@ export type TransitStress =
   | 'long_haul_refrigerated'
   | 'rough_terrain_unpaved';
 
+export type OptimizationPreference = 'balanced' | 'sustainability' | 'cost';
+
+export interface RankingWeightsResponse {
+  w_barrier: number;
+  w_sustainability: number;
+  w_cost: number;
+}
+
 export interface EvidenceSourceResponse {
   reference_id: string;
   citation_short: string;
@@ -109,6 +117,7 @@ export interface RecommendationCreateRequest {
   storage_type: StorageType;
   transit_stress: TransitStress;
   user_sustainability_preference?: boolean;
+  optimization_preference?: OptimizationPreference;
 
   // Optional commodity property overrides
   moisture_pct?: number | null;
@@ -135,6 +144,7 @@ export interface TargetSpecificationsResponse {
   target_wvtr_rationale: string;
   target_otr_rationale: string;
   thickness_rationale: string;
+  adjusted_respiration_rate_co2?: number | null;
 }
 
 export interface CandidateEvaluationResponse {
@@ -150,6 +160,10 @@ export interface CandidateEvaluationResponse {
   sustainability_score: number;
   cost_score: number;
   composite_utility_score: number;
+  barrier_contribution?: number;
+  sustainability_contribution?: number;
+  cost_contribution?: number;
+  rank?: number;
   nominal_thickness_um: number;
   nominal_otr: number;
   nominal_wvtr: number;
@@ -183,6 +197,8 @@ export interface RecommendationResponse {
   explanation: ExplanationResponse | null;
   safety_advisory: string | null;
   uncertainty_notes: string[];
+  applied_weights?: RankingWeightsResponse | null;
+  optimization_preference?: OptimizationPreference;
   created_at: string;
 }
 

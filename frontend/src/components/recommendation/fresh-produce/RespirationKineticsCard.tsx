@@ -4,11 +4,13 @@ import type { ProduceRespirationResponse } from '../../../types/api';
 interface RespirationKineticsCardProps {
   respirationData: ProduceRespirationResponse | null;
   storageTempC: number;
+  authoritativeAdjustedRate?: number | null;
 }
 
 export const RespirationKineticsCard: React.FC<RespirationKineticsCardProps> = ({
   respirationData,
   storageTempC,
+  authoritativeAdjustedRate,
 }) => {
   if (!respirationData) {
     return (
@@ -22,11 +24,15 @@ export const RespirationKineticsCard: React.FC<RespirationKineticsCardProps> = (
     );
   }
 
-  // Calculate temperature scaled estimate using Q10 formula from Fonseca 2002: R(T) = R_ref * Q10^((T - T_ref)/10)
+  // Use authoritative domain calculation if provided; fallback to presentation scaling (Fonseca 2002)
   const tempDiff = storageTempC - respirationData.reference_temp_c;
-  const scaledRate = (
-    respirationData.respiration_rate_co2 * Math.pow(respirationData.q10_factor, tempDiff / 10.0)
-  ).toFixed(1);
+  const scaledRate =
+    authoritativeAdjustedRate !== undefined && authoritativeAdjustedRate !== null
+      ? authoritativeAdjustedRate.toFixed(1)
+      : (
+          respirationData.respiration_rate_co2 *
+          Math.pow(respirationData.q10_factor, tempDiff / 10.0)
+        ).toFixed(1);
 
   const isFreezing = storageTempC < 0.0;
   const isHeatAbuse = storageTempC > 25.0;

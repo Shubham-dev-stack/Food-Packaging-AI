@@ -13,10 +13,12 @@ import { AssumptionsPanel } from '../components/recommendation/AssumptionsPanel'
 import { UncertaintyNotesCard } from '../components/recommendation/UncertaintyNotesCard';
 import { LimitationsPanel } from '../components/recommendation/LimitationsPanel';
 import { FreshProduceDashboard } from '../components/recommendation/fresh-produce/FreshProduceDashboard';
+import { TradeOffAnalysisCard } from '../components/recommendation/trade-off/TradeOffAnalysisCard';
 import type {
   RecommendationResponse,
   RecommendationCreateRequest,
   CommodityDetailResponse,
+  OptimizationPreference,
 } from '../types/api';
 
 interface RecommendationResultViewProps {
@@ -25,6 +27,8 @@ interface RecommendationResultViewProps {
   commodityDetail?: CommodityDetailResponse | null;
   onModifyInputs: () => void;
   onNewEvaluation: () => void;
+  onPreferenceChange?: (preference: OptimizationPreference) => void;
+  isPreferenceLoading?: boolean;
 }
 
 export const RecommendationResultView: React.FC<RecommendationResultViewProps> = ({
@@ -33,6 +37,8 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
   commodityDetail,
   onModifyInputs,
   onNewEvaluation,
+  onPreferenceChange,
+  isPreferenceLoading,
 }) => {
   const explanation = result.explanation;
   const citedSources = explanation?.cited_evidence_sources || [];
@@ -138,7 +144,18 @@ export const RecommendationResultView: React.FC<RecommendationResultViewProps> =
       {/* 7. Candidate Comparison Matrix */}
       <CandidateComparisonTable candidates={result.ranked_candidates} />
 
-      {/* 8. Disqualified Candidates (Why other candidates were not selected) */}
+      {/* 8. Multi-Criteria Trade-Off & Sensitivity Analysis */}
+      <TradeOffAnalysisCard
+        rankedCandidates={result.ranked_candidates}
+        currentPreference={
+          result.optimization_preference || submittedInput?.optimization_preference || 'balanced'
+        }
+        appliedWeights={result.applied_weights}
+        onPreferenceChange={onPreferenceChange}
+        isLoading={isPreferenceLoading}
+      />
+
+      {/* 9. Disqualified Candidates (Why other candidates were not selected) */}
       <DisqualifiedCandidatesList disqualified={result.disqualified_candidates} />
 
       {/* 9. Scientific Evidence Traceability Panel & Citation Modal */}

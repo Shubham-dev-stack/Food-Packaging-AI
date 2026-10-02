@@ -12,6 +12,7 @@ from backend.app.domain.respiration import (
 from backend.app.domain.safety import evaluate_food_safety_advisory
 from backend.app.domain.types import (
     CandidateEligibility,
+    OptimizationPreference,
     RankingWeightsConfig,
     RecommendationInput,
     RecommendationResultDomain,
@@ -135,6 +136,7 @@ class RecommendationEngine:
                     f"OTR >= {eq_otr:.1f} cm3/(m2*day*atm) under coupled mass balance."
                 ),
                 thickness_rationale="Gauge balanced for breathable web stability (30-40 um).",
+                adjusted_respiration_rate_co2=adj_rate,
             )
             if perf_rationale:
                 uncertainties.append(perf_rationale)
@@ -172,11 +174,16 @@ class RecommendationEngine:
         viable, disqualified = filter_candidate_materials(materials, inp, specs, is_respiring)
 
         # 6. Multi-Attribute Ranking
-        ranked, primary, alternative = rank_candidates(
+        effective_pref = inp.optimization_preference
+        if inp.user_sustainability_preference and effective_pref == OptimizationPreference.BALANCED:
+            effective_pref = OptimizationPreference.SUSTAINABILITY
+
+        ranked, primary, alternative, applied_weights = rank_candidates(
             candidates=viable,
             specs=specs,
             prioritize_sustainability=inp.user_sustainability_preference,
             weights_config=weights_config,
+            preference=effective_pref,
         )
 
         # 7. Food Safety Advisory Interceptor
@@ -226,4 +233,6 @@ class RecommendationEngine:
             explanation=explanation,
             safety_advisory=safety_advisory,
             uncertainty_notes=uncertainties,
+            applied_weights=applied_weights,
+            optimization_preference=effective_pref,
         )

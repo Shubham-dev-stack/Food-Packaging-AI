@@ -82,6 +82,7 @@ export const FreshProduceDashboard: React.FC<FreshProduceDashboardProps> = ({
       <RespirationKineticsCard
         respirationData={primaryRespData}
         storageTempC={storageTempC}
+        authoritativeAdjustedRate={targetSpecs?.adjusted_respiration_rate_co2}
       />
 
       {/* MAP Suitability & Headspace Gas Target Card */}
