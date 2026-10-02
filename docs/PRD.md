@@ -318,7 +318,11 @@ Input Food & Storage Parameters ➔ Validate ➔ Evaluate Barrier & Respiration 
 - **FR-005 (MUST):** The system shall branch into produce-specific respiration logic whenever an active respiring commodity is evaluated.
   - *Acceptance Criteria:* Respiring commodities trigger multi-factor gas balance evaluation (respiration, weight, pack geometry, permeability, temperature) and reject continuous barrier films when asphyxiation/fermentation risks exist.
 - **FR-006 (MUST):** The system shall filter and rank candidate packaging materials, presenting the top recommended solution and viable alternatives.
-  - *Acceptance Criteria:* Recommendations clearly identify the material structure, trade code, and suitability score.
+  - *Acceptance Criteria:* Recommendations clearly identify the material structure, trade code, and suitability score. Candidates failing physical barrier or safety constraints are strictly disqualified before ranking. Qualified candidates are ranked via transparent linear composite utility ($U = w_b \cdot S_b + w_s \cdot S_s + w_c \cdot S_c$) supporting user decision presets:
+    - Balanced (Default): $w_b=0.50, w_s=0.30, w_c=0.20$ `[PROTOTYPE ASSUMPTION]`
+    - Sustainability Priority: $w_b=0.40, w_s=0.45, w_c=0.15$ `[PROTOTYPE ASSUMPTION]`
+    - Cost Priority: $w_b=0.40, w_s=0.15, w_c=0.45$ `[PROTOTYPE ASSUMPTION]`
+    Preset weights provide decision-support trade-off sensitivity modeling and are explicitly labeled as prototype assumptions, not scientifically optimal constants.
 - **FR-007 (MUST):** The system shall provide technical packaging specifications: OTR, WVTR, film thickness, sealability, gas permeability, mechanical strength, and MAP suitability.
   - *Acceptance Criteria:* Each specification card displays the value, unit, relevant ASTM testing standard, and functional rationale.
 

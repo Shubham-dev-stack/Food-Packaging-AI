@@ -137,10 +137,13 @@ flowchart TD
    - Eliminates materials that undergo brittle fracture at target storage temperature (e.g., rigid plastics in frozen mode).
    - Eliminates packaging structures whose gas exchange rates induce anaerobic asphyxiation or excessive condensation for the specific produce crop and geometry.
 2. **Multi-Criteria Ranking:**
-   - Evaluates remaining viable candidates across 3 dimensions:
-     - **Barrier Safety Margin:** How reliably the material's transmission falls within target requirement ranges.
-     - **Sustainability & Circularity Index:** Favoring recyclable mono-materials (e.g. all-PE) over unrecyclable multi-material laminates.
-     - **Relative Economic Index:** Normalized cost multiplier (baseline LDPE = 1.0) `[PROTOTYPE ASSUMPTION]`.
+   - Evaluates remaining viable candidates across 3 dimensions using transparent composite utility:
+     $$U(m) = w_b \cdot S_{\text{barrier}}(m) + w_s \cdot S_{\text{sustainability}}(m) + w_c \cdot S_{\text{cost}}(m)$$
+   - Documented decision-support preference presets `[PROTOTYPE ASSUMPTION]`:
+     - **Balanced (Default):** $w_b=0.50$ (50% Barrier), $w_s=0.30$ (30% Sustainability), $w_c=0.20$ (20% Cost Index).
+     - **Sustainability-Focused:** $w_b=0.40$ (40% Barrier), $w_s=0.45$ (45% Sustainability), $w_c=0.15$ (15% Cost Index).
+     - **Cost-Sensitive:** $w_b=0.40$ (40% Barrier), $w_s=0.15$ (15% Sustainability), $w_c=0.45$ (45% Cost Index).
+   - *Boundary Rule:* Soft preference weights only rank qualified candidates; disqualified materials cannot be rescued by weighting adjustments. Weights model decision sensitivity, not certified economic optimization.
    - Produces the Primary Recommendation alongside an explicit Eco-Friendly/Recyclable Alternative.
 
 ### 3.5 Explainability & Traceability Engine
