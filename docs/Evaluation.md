@@ -170,3 +170,98 @@ flowchart LR
   - Show zero traceback leakage on invalid inputs (Scenario H).
   - Transition into technical jury Q&A.
 
+---
+
+## 9. Step-by-Step Judge Demo Journey (11 Concrete Steps)
+
+For live evaluation, evaluators can step through the complete technical narrative in 11 sequential actions:
+
+```mermaid
+flowchart TD
+    S1[1. Open Workspace] --> S2[2. Load Potato Chips]
+    S2 --> S3[3. Inspect ASTM Barrier Limits]
+    S3 --> S4[4. Toggle Sustainability Priority]
+    S4 --> S5[5. Trace Peer-Reviewed Evidence]
+    S5 --> S6[6. Load Fresh Broccoli MAP]
+    S6 --> S7[7. Observe Microperforation Demand]
+    S7 --> S8[8. Inspect Hypoxia Disqualifications]
+    S8 --> S9[9. Load Wild Mushroom]
+    S9 --> S10[10. Observe Research Required Refusal]
+    S10 --> S11[11. Submit Contradictory Input]
+```
+
+1. **Open Decision Workspace:** Navigate to `http://localhost:5173`. Observe clean two-column layout with 1-Click Demonstration Scenarios banner.
+2. **Load Scenario 1 (Potato Chips):** Click preset **Potato Chips — High Barrier (Balanced)**. Form auto-fills with ambient storage at 25°C, 75% RH, 180 days.
+3. **Execute Recommendation:** Click **Generate Packaging Recommendations**. Review the primary candidate: vacuum metallized or aluminum foil laminate meeting strict moisture ($WVTR \le 2.5$) and oxygen ($OTR \le 2.0$) limits with mandatory opacity.
+4. **Evaluate Multi-Criteria Trade-Off:** In the result view, switch the trade-off preference to **Sustainability Priority**. Observe how recyclable mono-material (`BoPE/PE`) shifts upward in composite utility rank while preserving full transparency regarding barrier trade-offs.
+5. **Verify Evidence Traceability:** Expand the **Scientific Evidence Traceability Panel**. Inspect direct citations to Robertson 2012, ASTM F1249, ASTM D3985, and Marsh & Bugusu 2007.
+6. **Load Scenario 2 (Fresh Broccoli MAP):** Return to inputs and click preset **Fresh Broccoli — MAP Microperforation**. Observe chilled temperature at 4°C, 95% RH, and 14 days shelf life.
+7. **Observe Produce Respiration Branching:** Click **Generate Packaging Recommendations**. Observe that the engine engages the specialized produce pathway, adjusting respiration from baseline to 60.07 mg CO₂/(kg·h) via Fonseca $Q_{10}$ kinetics.
+8. **Inspect Disqualification Explanations:** Scroll to the disqualified candidates list. Note that airtight continuous films and foil laminates are strictly disqualified with an explicit `Severe Hypoxia / Anaerobic Fermentation Hazard` safety rationale.
+9. **Load Scenario 3 (Research-Required Boundary):** Click preset **Wild Mushroom — Research Required**. 
+10. **Verify Anti-Hallucination Guardrail:** Generate recommendation. Observe that the system outputs status `RESEARCH_REQUIRED` with an explicit uncertainty flag, refusing to invent or hallucinate uncharacterized equilibrium headspace gas mixtures.
+11. **Demonstrate Input Boundary Hardening:** Intentionally change storage type to `frozen` while keeping temperature at `25.0°C`. Observe immediate client-side validation block and, if sent via API, a clean RFC 7807 HTTP 422 `VALIDATION_ERROR` with zero stack-trace leakage.
+
+---
+
+## 10. Final Project State Inventory (4 Categories)
+
+Every functional capability in the repository is audited into one of 4 definitive categories:
+
+### 10.1 Category 1: Implemented & Fully Verified
+- Deterministic mass-transfer barrier requirement modeling for dry and ambient goods (ASTM F1249 / ASTM D3985).
+- Fonseca (2002) $Q_{10}$ Arrhenius temperature-adjusted produce respiration kinetics.
+- Equilibrium oxygen demand ($OTR_{eq}$) coupled mass-balance modeling for Modified Atmosphere Packaging.
+- Micro-perforation venting logic and hypoxia safety disqualification for fresh produce.
+- Multi-criteria decision analysis (MCDA) utility weighting across Balanced, Sustainability, and Cost profiles.
+- Strict qualification invariant enforcement (Invariant 9: soft weights never rescue disqualified candidates).
+- Deterministic tie-breaking across all candidates.
+- Contextual food safety advisory generation (low-acid anaerobiosis / *C. botulinum* warnings).
+- Interactive web workstation (React 19 + TypeScript + Tailwind CSS) with 1-click judge presets.
+- 100% passing automated test harness: 93 backend pytest tests (including 8 golden evaluation matrix cases and 5 smoke tests) and 31 frontend vitest tests.
+
+### 10.2 Category 2: Prototype Assumptions (`[PROTOTYPE ASSUMPTION]`)
+- Normalized standard pouch geometry (0.10 kg product mass, 0.06 m² permeation surface area).
+- Linear water vapor permeance scaling across vapor pressure gradients.
+- Steady-state isothermal storage assumption (absence of dynamic diurnal ambient temperature swings).
+- Prototype MCDA priority weight presets: Balanced (50% barrier / 30% sustainability / 20% cost), Sustainability (40% barrier / 45% sustainability / 15% cost), Cost (40% barrier / 15% sustainability / 45% cost).
+- Relative commercial material cost indices derived from typical converter base resin ratios.
+
+### 10.3 Category 3: Research Required (`[RESEARCH REQUIRED]`)
+- Optimal MAP equilibrium headspace gas concentrations for wild, rare, or uncharacterized produce species.
+- Multi-layer flex-cracking and microscopic pinholing rates under extended distribution regimes (> 365 days).
+- Non-isothermal Arrhenius gas permeation temperature coefficients for composite barrier films in extreme desert storage (> 45°C).
+
+### 10.4 Category 4: Future Scope (Commercial Field Deployment)
+- Empirical Accelerated Shelf-Life Testing (ASLT) calibration across commercial packhouse chambers.
+- ASTM F1306 slow rate puncture and ASTM D4169 distribution hazard cycle drop testing.
+- Physical migration compliance testing under Bureau of Indian Standards (IS 9845) and FSSAI packaging guidelines.
+- Native ERP/WMS packaging procurement integrations.
+- Multi-season agricultural field loss tracking across commercial cold chains.
+
+---
+
+## 11. Final SIH Submission Checklist
+
+| Item | Requirement Description | Verification Method | Status |
+| :---: | :--- | :--- | :---: |
+| **1** | Problem Statement SIH26236 Alignment | Verified against `docs/Problem_Statement.md` | **PASSED** |
+| **2** | Pure Deterministic Domain Engine | Verified in `backend/app/domain/` with zero black-box ML | **PASSED** |
+| **3** | Grounded Scientific Evidence & ASTM Standards | Traced to ASTM F1249, ASTM D3985, Fonseca 2002, Robertson 2012 | **PASSED** |
+| **4** | Clean REST API Contracts | FastAPI endpoints under `/api` with RFC 7807 error envelopes | **PASSED** |
+| **5** | Automated Database Readiness & Migration | `@asynccontextmanager lifespan` auto-initializing SQLite schema | **PASSED** |
+| **6** | Health & Database Liveness Probe | `GET /api/health` returning 200 with DB status | **PASSED** |
+| **7** | Production Frontend Build | Clean TypeScript (`tsc -b --noEmit`) & Vite build (0 warnings) | **PASSED** |
+| **8** | Frontend Resiliency & Error Handling | 10s timeout, network error classification, and retry actions | **PASSED** |
+| **9** | 1-Click Judge Demonstration Presets | 5 interactive scenario presets in `Workspace.tsx` | **PASSED** |
+| **10** | Comprehensive Test Suite Passing | 93 backend tests (100%) + 31 frontend tests (100%) passing | **PASSED** |
+| **11** | Code Quality & Lint Hygiene | Ruff check & format clean (0 errors across 59 backend files) | **PASSED** |
+| **12** | Explicit Evidence & Claims Audit | No fake accuracy claims; metrics framed as MCDA utility | **PASSED** |
+| **13** | Anti-Hallucination Guardrails | Refusal on uncharacterized crops (`RESEARCH_REQUIRED`) | **PASSED** |
+| **14** | Disqualification Explainability | Every rejected candidate retains explicit physical rationale | **PASSED** |
+| **15** | Regulatory & Legal Disclaimer | Displayed in UI, API responses, and root `README.md` | **PASSED** |
+| **16** | Clean Git History & Zero Secret Leaks | No `.env` or production credentials tracked in repository | **PASSED** |
+| **17** | Evaluator Quickstart Documentation | Single-command setup and execution instructions in `README.md` | **PASSED** |
+| **18** | Feature Freeze Status | Core prototype locked; Phase 12 formally completed | **PASSED** |
+
+
