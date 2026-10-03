@@ -3,6 +3,7 @@ import { CommodityPicker } from '../components/inputs/CommodityPicker';
 import { BaselinePreviewCard } from '../components/inputs/BaselinePreviewCard';
 import { EnvironmentalInputs } from '../components/inputs/EnvironmentalInputs';
 import { PropertyOverrides } from '../components/inputs/PropertyOverrides';
+import { DemoPresets, type DemoPreset } from '../components/inputs/DemoPresets';
 import { RecommendationResultView } from './RecommendationResultView';
 import { Alert } from '../components/common/Alert';
 import { api, ApiError } from '../services/api';
@@ -21,6 +22,7 @@ type WorkflowStep = 'input' | 'result';
 export const Workspace: React.FC = () => {
   // Navigation / Workflow view state
   const [currentStep, setCurrentStep] = useState<WorkflowStep>('input');
+  const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
   // Commodity state
   const [commodities, setCommodities] = useState<CommodityBriefResponse[]>([]);
@@ -285,6 +287,27 @@ export const Workspace: React.FC = () => {
     }
   };
 
+  const handleApplyPreset = (preset: DemoPreset) => {
+    setActivePresetId(preset.id);
+    setSelectedCommodityId(preset.commodityId);
+    setShelfLifeDays(preset.shelfLifeDays);
+    setStorageType(preset.storageType);
+    setStorageTempC(preset.storageTempC);
+    setStorageRhPct(preset.storageRhPct);
+    setTransitStress(preset.transitStress);
+    setOptimizationPreference(preset.optimizationPreference);
+    setSustainabilityPreference(preset.sustainabilityPreference ?? (preset.optimizationPreference === 'sustainability'));
+    setPackageWeightKg(preset.packageWeightKg);
+    setPackageAreaM2(preset.packageAreaM2);
+    setMoistureContentPct(preset.moistureContentPct ?? null);
+    setWaterActivityAw(preset.waterActivityAw ?? null);
+    setFatContentPct(preset.fatContentPct ?? null);
+    setPh(preset.ph ?? null);
+    setRespirationRateCo2(preset.respirationRateCo2 ?? null);
+    setErrors({});
+    setGeneralError(null);
+  };
+
   const handleResetForNewEvaluation = () => {
     setRecommendationResult(null);
     setCurrentStep('input');
@@ -292,6 +315,7 @@ export const Workspace: React.FC = () => {
     setErrors({});
     setOptimizationPreference('balanced');
     setSubmittingPreference(false);
+    setActivePresetId(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -401,10 +425,18 @@ export const Workspace: React.FC = () => {
           />
         ) : (
           /* WORKFLOW VIEW 1: INPUT WORKSPACE */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Input Workstation Form (7 cols on large screens) */}
-            <div className="lg:col-span-7 space-y-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
+            {/* Quick-Load Judge Evaluation Scenarios */}
+            <DemoPresets
+              onApplyPreset={handleApplyPreset}
+              activePresetId={activePresetId}
+              disabled={submitting || loadingCommodities}
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left Column: Input Workstation Form (7 cols on large screens) */}
+              <div className="lg:col-span-7 space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Commodity Selector Card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-200 pb-3">
@@ -568,8 +600,9 @@ export const Workspace: React.FC = () => {
               </div>
             </div>
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      )}
+    </main>
+  </div>
   );
 };
